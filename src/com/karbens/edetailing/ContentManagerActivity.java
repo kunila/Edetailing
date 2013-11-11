@@ -222,29 +222,7 @@ public class ContentManagerActivity extends Activity implements ContentDownloadL
 
 	}
 
-
-	public int downloadProgress() {
-		 
-		while (fileSize <= 1000000) {
  
-			fileSize++;
- 
-			if (fileSize == 100000) {
-				return 10;
-			} else if (fileSize == 200000) {
-				return 20;
-			} else if (fileSize == 300000) {
-				return 30;
-			}
-			// ...add your own
- 
-		}
- 
-		return 100;
- 
-	}
-
-	 
 	@Override
 	public void allDownloadComplete() {
 
