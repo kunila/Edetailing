@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/superLayout"
+    android:orientation="vertical"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent">
+    
+    <LinearLayout 
+    	android:id="@+id/scrolllayout"
+    	android:orientation="horizontal"
+    	android:layout_width="match_parent"
+    	android:layout_height="70dp">
+    
+        <Button 
+        	android:id="@+id/btn"
+        	android:layout_width="wrap_content"
+        	android:layout_height="70dp"
+        	android:text="Go Back" />     
+        
+        <HorizontalScrollView     
+        	android:layout_width="850dp"
+        	android:layout_height="match_parent"
+        	android:id="@+id/scrollLayout">
+        
+        <LinearLayout  
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal" 
+            android:id="@+id/lin">
+
+            </LinearLayout>
+        
+    	</HorizontalScrollView>
+    	
+        <Button 
+        	android:id="@+id/exitScrollBtn"
+        	android:layout_width="70dp"
+        	android:layout_height="70dp"
+        	android:text="Exit" />
+    
+    </LinearLayout>
+    
+    <LinearLayout 
+            android:id="@+id/exitlayout"
+            android:orientation="horizontal"
+            android:layout_gravity="right"
+            android:layout_width="70dp"
+            android:layout_height="70dp">
+            
+            <Button 
+        		android:id="@+id/exitBtn"
+        		android:layout_width="wrap_content"
+        		android:layout_height="70dp"
+        		android:text="Exit" />     
+            
+    	</LinearLayout>
+    
+    <android.support.v4.view.ViewPager
+        android:id="@+id/parentView"
+        android:layout_width="fill_parent"
+        android:layout_height="0dp"
+        
+        android:layout_weight="1" />
+        
+        
+    
+        
+        
+       
+   <!-- <com.viewpagerindicator.LinePageIndicator
+        android:id="@+id/indicator"
+        android:padding="5dp"
+        android:layout_height="wrap_content"
+        android:layout_width="fill_parent"
+        app:strokeWidth="4dp"
+        app:lineWidth="30dp"
+        app:unselectedColor="#FF888888"
+       /> -->
+
+</LinearLayout>

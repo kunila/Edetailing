@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:padding="5dp" >
+ 
+    <ImageView
+        android:id="@+id/grid_item_image"
+        android:layout_width="150px"
+        android:layout_height="150px"
+        android:layout_marginRight="10px"
+        android:src="@drawable/content_frame"
+        >
+    </ImageView>
+ 
+    <TextView
+        android:id="@+id/grid_item_label"
+        android:layout_width="150px"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="60px"
+        android:layout_centerHorizontal="true"
+        android:textSize="15px" 
+        android:textColor="@android:color/black"
+        android:layout_alignTop="@id/grid_item_image">
+    </TextView>
+    
+    <Button 
+        android:id="@+id/dwnBtn"
+        android:layout_width="25dp"
+        android:layout_height="25dp"
+        android:layout_marginTop="115px"
+        android:layout_marginLeft="115px"
+        android:layout_alignTop="@id/grid_item_image"
+        android:background="@drawable/download_button"
+        />
+	<Button 
+        android:id="@+id/pauseBtn"
+        android:layout_width="25dp"
+        android:layout_height="25dp"
+        android:layout_marginTop="115px"
+        android:layout_marginLeft="115px"
+        android:layout_alignTop="@id/grid_item_image"
+        android:visibility="gone"
+        android:background="@drawable/pausebtn"
+        />
+
+  
+    <ProgressBar
+        android:id="@+id/player_exp_bar"
+        style="@android:style/Widget.ProgressBar.Horizontal"
+        android:layout_width="70dp"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/grid_item_label"
+        android:layout_alignTop="@+id/dwnBtn"
+        android:layout_marginLeft="5dp"
+        android:layout_marginTop="10dp"
+        android:maxHeight="5dip"
+        android:minHeight="5dip"
+        android:visibility="gone"
+        android:progress="0" />
+
+</RelativeLayout>
