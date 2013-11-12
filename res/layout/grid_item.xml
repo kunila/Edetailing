@@ -43,7 +43,16 @@
         android:visibility="gone"
         android:background="@drawable/pausebtn"
         />
-
+	<Button 
+        android:id="@+id/resumeBtn"
+        android:layout_width="25dp"
+        android:layout_height="25dp"
+        android:layout_marginTop="115px"
+        android:layout_marginLeft="115px"
+        android:layout_alignTop="@id/grid_item_image"
+        android:visibility="gone"
+        android:background="@drawable/resume"
+        />
   
     <ProgressBar
         android:id="@+id/player_exp_bar"

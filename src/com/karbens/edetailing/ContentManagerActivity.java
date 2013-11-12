@@ -159,7 +159,10 @@ public class ContentManagerActivity extends Activity implements ContentDownloadL
 			
 	     // int downloadCounter = EdetailingApplication.mBrandArr.get(0).getmContentArr().get(index).getProgressCount();
 	        
-        	Button downloadbutton = (Button) layout.findViewById(R.id.dwnBtn);
+        	final Button downloadbutton = (Button) layout.findViewById(R.id.dwnBtn);
+        	
+        	final Button resumeDwnBtn = (Button) layout.findViewById(R.id.resumeBtn);
+        	
         	downloadbutton.setOnClickListener(new OnClickListener() {
 				
 				@Override
@@ -167,8 +170,11 @@ public class ContentManagerActivity extends Activity implements ContentDownloadL
 					
 			        progressBar.setVisibility(View.VISIBLE);
 			        pauseButton.setVisibility(View.VISIBLE);
+			        downloadbutton.setVisibility(View.GONE);
+			        resumeDwnBtn.setVisibility(View.GONE);
+			        
 			    	//Fresh Download
-			        counter = mDataManager.downloadData(EdetailingApplication.mBrandArr.get(0).getmContentArr().get(index),index,0);//calls downloadData with index
+			        mDataManager.downloadData(EdetailingApplication.mBrandArr.get(0).getmContentArr().get(index),index,0);//calls downloadData with index
 
 			     
 				}
@@ -178,8 +184,11 @@ public class ContentManagerActivity extends Activity implements ContentDownloadL
 				
 				@Override
 				public void onClick(View v) {
-					progressBar.setVisibility(View.INVISIBLE);
-			        pauseButton.setVisibility(View.INVISIBLE);
+					//progressBar.setVisibility(View.INVISIBLE);
+			        pauseButton.setVisibility(View.GONE);
+			        downloadbutton.setVisibility(View.GONE);
+			        resumeDwnBtn.setVisibility(View.VISIBLE);
+			        
 					Toast.makeText(mContext, "Cancel download", Toast.LENGTH_LONG).show();
 					
 					
@@ -192,6 +201,20 @@ public class ContentManagerActivity extends Activity implements ContentDownloadL
 					// Now insert whatever has been downloaded
 					
 					
+				}
+			});
+        	
+        	
+        	resumeDwnBtn.setOnClickListener(new OnClickListener() {
+				
+				@Override
+				public void onClick(View v) {
+					// TODO Auto-generated method stub
+					pauseButton.setVisibility(View.VISIBLE);
+			        downloadbutton.setVisibility(View.GONE);
+			        resumeDwnBtn.setVisibility(View.GONE);
+					
+			        mDataManager.downloadData(EdetailingApplication.mBrandArr.get(0).getmContentArr().get(index),index,1);//calls downloadData with index
 				}
 			});
  
@@ -245,11 +268,11 @@ public class ContentManagerActivity extends Activity implements ContentDownloadL
 	public void updateDownloadProgress(int contentId, long totalread) {
 		
 		
-		System.out.println("Total Read :"+totalread);
-		EdetailingApplication.mBrandArr.get(0).getmContentArr().get(contentId).setProgressValue(EdetailingApplication.mBrandArr.get(0).getmContentArr().get(contentId).getProgressValue()+(int)totalread);
+		//System.out.println("Total Read :"+totalread);
+		//EdetailingApplication.mBrandArr.get(0).getmContentArr().get(contentId).setProgressValue(EdetailingApplication.mBrandArr.get(0).getmContentArr().get(contentId).getProgressValue()+(int)totalread);
 		
 		
-		mAdapter.notifyDataSetChanged();
+		//mAdapter.notifyDataSetChanged();
 	}
 
 }

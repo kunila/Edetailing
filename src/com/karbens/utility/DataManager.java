@@ -162,18 +162,26 @@ public class DataManager {
 			aParent = content.getmParentArr().get(l);
 			parentSize = content.getmParentArr().size();
 			
-			dwnContent = new DownloadContent(contIndex, parentIndex, 0, 0, content,operationType);
-			String fileName = aParent.getmContentUrl().substring(aParent.getmContentUrl().lastIndexOf('/')+1, aParent.getmContentUrl().length());
-			dwnContent.execute(aParent.getmContentUrl(),fileName,content.getmName()+"/"+aParent.getmName());
+			if(aParent.getmSlideBgPath() == "")
+			{
+				dwnContent = new DownloadContent(contIndex, parentIndex, 0, 0, content,operationType);
+				String fileName = aParent.getmContentUrl().substring(aParent.getmContentUrl().lastIndexOf('/')+1, aParent.getmContentUrl().length());
+				dwnContent.execute(aParent.getmContentUrl(),fileName,content.getmName()+"/"+aParent.getmName());
+				dwnCntArr.add(dwnContent);
+				
+				// Get download size
+				EdetailingApplication.mBrandArr
+				.get(0)
+				.getmContentArr()
+				.get(contIndex)
+				.setDownloadSize(
+						EdetailingApplication.mBrandArr.get(0)
+								.getmContentArr().get(contIndex)
+								.getDownloadSize()
+								+ 1);
+			}
 			
-			dwnCntArr.add(dwnContent);
 			
-			/*
-			dwnParent= new DownloadParent(contIndex,parentIndex,0,content);
-			//String baseName = FilenameUtils.getBaseName(aParent.getmContentUrl());
-			String fileName = aParent.getmContentUrl().substring(aParent.getmContentUrl().lastIndexOf('/')+1, aParent.getmContentUrl().length());
-			dwnParent.execute(aParent.getmContentUrl(),fileName,content.getmName()+"/"+aParent.getmName());
-			*/
 			
 			for(int i=0;i<aParent.getmChildArr().size();i++)
 			{
@@ -181,30 +189,61 @@ public class DataManager {
 				final int childIndex = i; // Child Index
 				aChild =  aParent.getmChildArr().get(i);
 				parentSize= parentSize+aParent.getmChildArr().size();
-				if(aChild.getmType()==2 || (aChild.getmType()==3)) //image or video
+				
+				if(aChild.getmType()==2 || (aChild.getmType()==3)) //image or video or reference button
 				{
 					
-					dwnContent = new DownloadContent(contIndex, parentIndex, childIndex, 1, content,operationType);
-					String childFileName = aChild.getmContentUrl().substring(aChild.getmContentUrl().lastIndexOf('/')+1, aChild.getmContentUrl().length());
-					String childFolder=content.getmName()+"/"+aParent.getmName();
-					//String childFileName = aParent.getmContentUrl().substring(aParent.getmContentUrl().lastIndexOf('/')+1, aParent.getmContentUrl().length());
+					if(aChild.getmFilePath() == "")
+					{
+						dwnContent = new DownloadContent(contIndex, parentIndex, childIndex, 1, content,operationType);
+						String childFileName = aChild.getmContentUrl().substring(aChild.getmContentUrl().lastIndexOf('/')+1, aChild.getmContentUrl().length());
+						String childFolder=content.getmName()+"/"+aParent.getmName();
+						//String childFileName = aParent.getmContentUrl().substring(aParent.getmContentUrl().lastIndexOf('/')+1, aParent.getmContentUrl().length());
+						
+						dwnContent.execute(aChild.getmContentUrl(),childFileName,childFolder);
+						
+						dwnCntArr.add(dwnContent);
+						
+						// Get download size
+						EdetailingApplication.mBrandArr
+						.get(0)
+						.getmContentArr()
+						.get(contIndex)
+						.setDownloadSize(
+								EdetailingApplication.mBrandArr.get(0)
+										.getmContentArr().get(contIndex)
+										.getDownloadSize()
+										+ 1);
+						
+					}
 					
-					dwnContent.execute(aChild.getmContentUrl(),childFileName,childFolder);
 					
-					dwnCntArr.add(dwnContent);
-					
-					/*
-					dwnChild= new DownloadChild(contIndex,childIndex,parentIndex,content);
-					String childFileName = aChild.getmContentUrl().substring(aChild.getmContentUrl().lastIndexOf('/')+1, aChild.getmContentUrl().length());
-					String childFolder=content.getmName()+"/"+aParent.getmName();
-					//String childFileName = aParent.getmContentUrl().substring(aParent.getmContentUrl().lastIndexOf('/')+1, aParent.getmContentUrl().length());
-					
-					dwnChild.execute(aChild.getmContentUrl(),childFileName,childFolder);
-					*/
 				}
+				
+				// Get download content size
+				EdetailingApplication.mBrandArr
+				.get(0)
+				.getmContentArr()
+				.get(contIndex)
+				.setContentSize(
+						EdetailingApplication.mBrandArr.get(0)
+								.getmContentArr().get(contIndex)
+								.getContentSize()
+								+ 1);
 				
 				
 			}
+			
+			// Get download content size
+			EdetailingApplication.mBrandArr
+			.get(0)
+			.getmContentArr()
+			.get(contIndex)
+			.setContentSize(
+					EdetailingApplication.mBrandArr.get(0)
+							.getmContentArr().get(contIndex)
+							.getContentSize()
+							+ 1);
 		}
 		
 		
@@ -287,6 +326,15 @@ public class DataManager {
 				}
 			}
 			
+			EdetailingApplication.mBrandArr
+			.get(0)
+			.getmContentArr()
+			.get(contentIndex)
+			.setProgressValue(
+					EdetailingApplication.mBrandArr.get(0)
+							.getmContentArr().get(contentIndex)
+							.getProgressValue()
+							+ 1);
 	
 			mListener.downloadFinished();
 			

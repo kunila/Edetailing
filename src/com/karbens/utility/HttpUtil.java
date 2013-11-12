@@ -53,7 +53,7 @@ public class HttpUtil {
 			int contentLength = connection.getContentLength();
 			Log.d(TAG, "con Len = " + contentLength);
 
-			
+			/*
 			if (opType == 0) //Fresh Download			
 			{
 				EdetailingApplication.mBrandArr
@@ -71,7 +71,9 @@ public class HttpUtil {
 			{
 				// DO Nothing
 			}
-
+			*/
+			
+			/*
 			EdetailingApplication.mBrandArr
 					.get(0)
 					.getmContentArr()
@@ -81,7 +83,7 @@ public class HttpUtil {
 									.getmContentArr().get(contentIndex)
 									.getDownloadSize()
 									+ contentLength);
-			
+			*/
 	
 
 			LOCAL_PATH = FileUtil.writeInputStreamToFile(contentIndex,

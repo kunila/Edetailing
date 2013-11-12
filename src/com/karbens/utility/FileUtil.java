@@ -59,7 +59,8 @@ public class FileUtil {
 			}
 			
 			//This loop will exit if data has been downloaded completely or the network has got lost 
-			while (read != -1) {
+			while (read != -1) 
+			{
 				byte buffer[] = new byte[packetSize];
 				
 				read = responseStream.read(buffer);
@@ -72,14 +73,15 @@ public class FileUtil {
 					
 					totalRead += read;
 					notificationReads += read;
-			        		
+			        
+					/*
 					if(mDownloadProgressListener != null )//&& notificationReads > DownloadConstants.PROGRESS_NOTIFICATION_THRESHOLD)
 					{
 						
 						mDownloadProgressListener.updateDownloadProgress(contentIndex, totalRead);
 						notificationReads = 0;
 					}
-					
+					*/
 					
 					Thread.sleep(5);//To make UI responsive. Shud be taken care later.
 					
@@ -99,16 +101,18 @@ public class FileUtil {
 				}
 			}
 
-			if (raf != null) {
+			if (raf != null) 
+			{
 				raf.close();
 			}        
 			
-		}catch(Exception e){
+		}
+		catch(Exception e)
+		{
 			e.printStackTrace();
 			Log.e(TAG, e.getMessage()+"");
 		}
 		
-    
 		return CACHE_PATH+ fileName;
 	}
 	
