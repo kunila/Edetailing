@@ -40,8 +40,8 @@ public class DataManager {
 	boolean isConnected = false;
 	Database db;
 	// downloadContent dwnContent  = null;
-	DownloadParent dwnParent = null;
-	DownloadChild dwnChild = null;
+	//DownloadParent dwnParent = null;
+	//DownloadChild dwnChild = null;
 	DownloadContent dwnContent = null;
 	//String localDwnPth="";
 	//int contentIndex=0;
@@ -204,6 +204,8 @@ public class DataManager {
 						
 						dwnCntArr.add(dwnContent);
 						
+						
+						
 						// Get download size
 						EdetailingApplication.mBrandArr
 						.get(0)
@@ -218,8 +220,26 @@ public class DataManager {
 					}
 					
 					
+					if(operationType == 0)
+					{
+						// Get download content size
+						EdetailingApplication.mBrandArr
+						.get(0)
+						.getmContentArr()
+						.get(contIndex)
+						.setContentSize(
+								EdetailingApplication.mBrandArr.get(0)
+										.getmContentArr().get(contIndex)
+										.getContentSize()
+										+ 1);
+					}
+					
 				}
 				
+			}
+			
+			if(operationType == 0)
+			{
 				// Get download content size
 				EdetailingApplication.mBrandArr
 				.get(0)
@@ -230,20 +250,8 @@ public class DataManager {
 								.getmContentArr().get(contIndex)
 								.getContentSize()
 								+ 1);
-				
-				
 			}
 			
-			// Get download content size
-			EdetailingApplication.mBrandArr
-			.get(0)
-			.getmContentArr()
-			.get(contIndex)
-			.setContentSize(
-					EdetailingApplication.mBrandArr.get(0)
-							.getmContentArr().get(contIndex)
-							.getContentSize()
-							+ 1);
 		}
 		
 		
@@ -283,6 +291,9 @@ public class DataManager {
 			String downloadUrl = params[0];
 			String fileName = params[1];
 			String folderName = params[2];
+			System.out.println("URL :"+downloadUrl);
+			System.out.println("FOLDER NAME :"+folderName);
+			System.out.println("FILE NAME :"+fileName);
 			
 			localDwnPth = HttpUtil.download(contentIndex,downloadUrl, fileName, folderName,operationType);
 			
@@ -297,12 +308,13 @@ public class DataManager {
 	    @Override
 	    protected void onCancelled() {
 	    	// TODO Auto-generated method stub
-	    	
+	    	EdetailingApplication.mBrandArr.get(0).getmContentArr().get(contentIndex).setDownloadStatus(2);
 	    	//insertContentToDB(aContent);
 	    	System.out.println("Async Cancelled..");
 	    	super.onCancelled();
 	    }
-		
+	    
+	    
 		@Override
 		protected void onPostExecute(String result) {
 			
@@ -310,20 +322,19 @@ public class DataManager {
 			
 			if(mType==0)
 			{
+				//System.out.println("Path to update :"+result);
+				
 				EdetailingApplication.mBrandArr.get(0).getmContentArr().get(contentIndex).getmParentArr().get(pIndex).setmSlideBgPath(result);
-				System.out.println("updated "+EdetailingApplication.mBrandArr.get(0).getmContentArr().get(contentIndex).getmParentArr().get(pIndex).getmSlideBgPath());
+				System.out.println("Updated to Data Structure :"+EdetailingApplication.mBrandArr.get(0).getmContentArr().get(contentIndex).getmParentArr().get(pIndex).getmSlideBgPath());
 			}
 			else
 			{
+				//System.out.println("Path to update :"+result);
+				
 				EdetailingApplication.mBrandArr.get(0).getmContentArr().get(contentIndex).getmParentArr().get(pIndex).getmChildArr().get(chIndex).setmFilePath(result);
-
-				if(aContent.getmParentArr().get(aContent.getmParentArr().size()-1).getmChildArr().size() == chIndex)
-				{
-					insertContentToDB(aContent);
-					//String currentDateTimeString = DateFormat.getDateTimeInstance().format(new Date());
-					//EdetailingApplication.mBrandArr.get(0).getmContentArr().get(contentIndex).setLastDownloadDate(currentDateTimeString);
-					//EdetailingApplication.mBrandArr.get(0).getmContentArr().get(contentIndex).setDownloadStatus(1);
-				}
+				System.out.println("Updated to Data Structure :"+EdetailingApplication.mBrandArr.get(0).getmContentArr().get(contentIndex).getmParentArr().get(pIndex).getmChildArr().get(chIndex).getmFilePath());
+				
+					
 			}
 			
 			EdetailingApplication.mBrandArr
@@ -335,6 +346,19 @@ public class DataManager {
 							.getmContentArr().get(contentIndex)
 							.getProgressValue()
 							+ 1);
+			
+			
+			
+			if(EdetailingApplication.mBrandArr.get(0).getmContentArr().get(contentIndex).getDownloadSize() == EdetailingApplication.mBrandArr.get(0).getmContentArr().get(contentIndex).getProgressValue())
+			{
+
+				String currentDateTimeString = DateFormat.getDateTimeInstance().format(new Date());
+				EdetailingApplication.mBrandArr.get(0).getmContentArr().get(contentIndex).setLastDownloadDate(currentDateTimeString);
+				EdetailingApplication.mBrandArr.get(0).getmContentArr().get(contentIndex).setDownloadStatus(1);
+				//EdetailingApplication.mBrandArr.get(0).getmContentArr().get(contentIndex).setIsDownloading(false);
+				
+				insertContentToDB(EdetailingApplication.mBrandArr.get(0).getmContentArr().get(contentIndex),contentIndex);
+			}
 	
 			mListener.downloadFinished();
 			
@@ -342,7 +366,7 @@ public class DataManager {
 		}
 	}
 	
-	
+	/*
 	public class DownloadParent extends AsyncTask<String, Void, String>
 	{
 		int parentIndex = 0;
@@ -368,11 +392,11 @@ public class DataManager {
 			
 			//localDwnPth=HttpUtil.download(contentIndex,downloadUrl, fileName, folderName,operationType);
 			
-			/*if(localDwnPth!=null)
-			{
-				counterDownloads=counterDownloads+1;
-				System.out.println("counter: "+counterDownloads);
-			}*/
+			//if(localDwnPth!=null)
+			//{
+				//counterDownloads=counterDownloads+1;
+				//System.out.println("counter: "+counterDownloads);
+			//}
 			return localDwnPth;
 		}
 		
@@ -453,8 +477,8 @@ public class DataManager {
 		}
 		
 	}
-	
-	
+	*/
+	/*
 	public class DownloadChild extends AsyncTask<String, Void, String>
 	{
 		final int childIndex;
@@ -500,7 +524,7 @@ public class DataManager {
 			//aContent.setDownloadCount(mParentIndex);
 			if(aContent.getmParentArr().get(aContent.getmParentArr().size()-1).getmChildArr().size() == childIndex)
 			{
-				insertContentToDB(aContent);
+				//insertContentToDB(aContent);
 			}
 			
 			super.onPostExecute(result);
@@ -509,9 +533,9 @@ public class DataManager {
 	
 		
 	}
-
+*/
 	
-	private void insertContentToDB(Content aContent) {
+	private void insertContentToDB(Content aContent,int contentIndex) {
 		
 		db = new Database(mContext);
 		
@@ -527,48 +551,48 @@ public class DataManager {
 			if(bBrand==null)
 			{
 				
-			long brandKey = db.createBrand(aBrand);
-			
-			for(int j = 0; j <EdetailingApplication.mBrandArr.get(i).getmContentArr().size(); j++)	
-			{
-				aContent = EdetailingApplication.mBrandArr.get(i).getmContentArr().get(j);
-				aContent.setbId(brandKey);
-			
-				long aContentId  =	aContent.getmId();
-				Content bContent =	db.getContent(aContentId);
-				if(bContent==null)
+				long brandKey = db.createBrand(aBrand);
+				
+				for(int j = 0; j <EdetailingApplication.mBrandArr.get(i).getmContentArr().size(); j++)	
 				{
-					long contentKey =db.createContent(aContent);
+					aContent = EdetailingApplication.mBrandArr.get(i).getmContentArr().get(j);
+					aContent.setbId(brandKey);
 				
-					for(int k = 0; k <EdetailingApplication.mBrandArr.get(i).getmContentArr().get(j).getmParentArr().size(); k++)	
+					long aContentId  =	aContent.getmId();
+					Content bContent =	db.getContent(aContentId);
+					if(bContent==null)
 					{
-						
-						Parent aParent = EdetailingApplication.mBrandArr.get(i).getmContentArr().get(j).getmParentArr().get(k);
-						aParent.setcId(contentKey);
-						long aParentId = aParent.getmId();
-						//String aParentName = aParent.getmName();
-						Parent bParent = db.getParent(aParentId);
-						if(bParent==null)
+						long contentKey =db.createContent(aContent);
+					
+						for(int k = 0; k <EdetailingApplication.mBrandArr.get(i).getmContentArr().get(j).getmParentArr().size(); k++)	
 						{
-							long parentKey =db.createParent(aParent);
-							for (int l = 0; l < EdetailingApplication.mBrandArr.get(i).getmContentArr().get(j).getmParentArr().get(k).getmChildArr().size(); l++) 
+							
+							Parent aParent = EdetailingApplication.mBrandArr.get(i).getmContentArr().get(j).getmParentArr().get(k);
+							aParent.setcId(contentKey);
+							long aParentId = aParent.getmId();
+							//String aParentName = aParent.getmName();
+							Parent bParent = db.getParent(aParentId);
+							if(bParent==null)
 							{
-								//contentCount
-								//aContent.setContentCount(EdetailingApplication.mBrandArr.get(i).getmContentArr().get(j).getmParentArr().size()+EdetailingApplication.mBrandArr.get(i).getmContentArr().get(j).getmParentArr().get(k).getmChildArr().size());
-								//System.out.println("count of content : "+aContent.getContentCount());
-								
-								Child aChild = EdetailingApplication.mBrandArr.get(i).getmContentArr().get(j).getmParentArr().get(k).getmChildArr().get(l);
-								aChild.setpID(parentKey);
-								long aChildId = aChild.getmID();
-								Child bChild = db.getChild(aChildId);
-								if(bChild==null)
-									db.createChild(aChild);
-							}
-					 	}
+								long parentKey =db.createParent(aParent);
+								for (int l = 0; l < EdetailingApplication.mBrandArr.get(i).getmContentArr().get(j).getmParentArr().get(k).getmChildArr().size(); l++) 
+								{
+									//contentCount
+									//aContent.setContentCount(EdetailingApplication.mBrandArr.get(i).getmContentArr().get(j).getmParentArr().size()+EdetailingApplication.mBrandArr.get(i).getmContentArr().get(j).getmParentArr().get(k).getmChildArr().size());
+									//System.out.println("count of content : "+aContent.getContentCount());
+									
+									Child aChild = EdetailingApplication.mBrandArr.get(i).getmContentArr().get(j).getmParentArr().get(k).getmChildArr().get(l);
+									aChild.setpID(parentKey);
+									long aChildId = aChild.getmID();
+									Child bChild = db.getChild(aChildId);
+									if(bChild==null)
+										db.createChild(aChild);
+								}
+						 	}
+						  }
 					  }
-				  }
-				
-			}
+					
+				}
 			
 			
 		  }
@@ -576,7 +600,7 @@ public class DataManager {
 			
 		}
 		//aContent.setProgressCount(counterDownloads);
-		mListener.allDownloadComplete();
+		mListener.allDownloadComplete(contentIndex);
 		
 	}
 	

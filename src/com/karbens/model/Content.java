@@ -19,6 +19,7 @@ public class Content implements Parcelable{
 	 private int downloadedSize;
 	 private int downloadSize;
 	 private int urlCount;
+	 private boolean isDownloading;
 	 
 	private ArrayList<Parent> mParentArr = new ArrayList<Parent>();
 	private ArrayList<DownloadContent> mDwnContentArr = new ArrayList<DownloadContent>();
@@ -122,7 +123,13 @@ public class Content implements Parcelable{
 		this.mDwnContentArr = mDwnContentArr;
 	}
 	
-	
+	public boolean getIsDownloading() {
+		return isDownloading;
+	}
+
+	public void setIsDownloading(boolean isDownloading) {
+		this.isDownloading = isDownloading;
+	}
 	
 
 	@Override
@@ -169,6 +176,8 @@ public class Content implements Parcelable{
 		//mParentArr = new ArrayList<Parent>();
 		
 	}
+
+	
 
 	
 

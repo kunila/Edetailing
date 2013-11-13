@@ -7,6 +7,7 @@ import java.io.RandomAccessFile;
 
 import com.karbens.listeners.DownloadProgressListener;
 
+import android.os.Environment;
 import android.util.Log;
 
 public class FileUtil {
@@ -16,23 +17,26 @@ public class FileUtil {
 	private static String CACHE_PATH = "/sdcard/";
 	private static final int DATA_PACKET_SIZE = 1024;
 	static String completePath="";
-	static DownloadProgressListener mDownloadProgressListener = null;
-	
+	//static DownloadProgressListener mDownloadProgressListener = null;
+	static File sdCard = Environment.getExternalStorageDirectory();
 	
 	
 	//returns path url hanged long to string
 	public static String writeInputStreamToFile(int contentIndex,String fileName,
 			InputStream responseStream, String folderName) throws IOException {
+		
 		long totalRead = 0;
 		int notificationReads = 0;
-		CACHE_PATH="/sdcard/edetailing/"+folderName+"/";
+		
+		CACHE_PATH= sdCard.getAbsolutePath()+"/edetailing/"+folderName+"/";
 	
 		//completePath = CACHE_PATH +folderName +"/" + fileName;
 		File fileDirectory = new File(CACHE_PATH);
 		
 		fileDirectory.mkdirs();
 			
-		File f = new File(CACHE_PATH+ fileName);
+		System.out.println("File path to be created :"+CACHE_PATH+ fileName);
+		File f = new File(fileDirectory,fileName);
 		
 		if(f.exists()){
 			f.delete();
