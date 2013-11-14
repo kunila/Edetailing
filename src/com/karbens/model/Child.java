@@ -22,13 +22,14 @@ public class Child implements Parcelable{
 	private long pID = 0; // Parent Foreign Key
 	
 
-	public long getmID() {
+	public int getmID() {
 		return mID;
 	}
 
 	public void setmID(int mID) {
 		this.mID = mID;
 	}
+	
 
 	public long getpID() {
 		return pID;
@@ -157,6 +158,8 @@ public class Child implements Parcelable{
 		//mChildArr = new ArrayList<Child>();
 	}
 	
+	
+
 	public static final Parcelable.Creator<Child> CREATOR=new Parcelable.Creator<Child>() 
 	{
 				

@@ -14,9 +14,12 @@ public class Content implements Parcelable{
 	 private int downloadStatus = 0;
 	 private String lastDownloadDate;
 	 
-	 private int progressValue;
-	 private int contentSize;
-	 private int downloadedSize;
+	 private int progressValue = 0;
+	 private int contentSize = 0;
+	 private int downloadedSize = 0;
+	 private int downloadCancelCount = 0;
+	 
+
 	 private int downloadSize;
 	 private int urlCount;
 	 private boolean isDownloading;
@@ -32,20 +35,20 @@ public class Content implements Parcelable{
 		this.bId = bId;
 	}
 	
+	public int getmId() {
+		return mId;
+	}
+
+	public void setmId(int mId) {
+		this.mId = mId;
+	}
+	
 	public String getmName() {
 		return mName;
 	}
 
 	public void setmName(String mName) {
 		this.mName = mName;
-	}
-
-	public long getmId() {
-		return mId;
-	}
-
-	public void setmId(int mId) {
-		this.mId = mId;
 	}
 
 	public int getDownloadStatus() {
@@ -129,6 +132,14 @@ public class Content implements Parcelable{
 
 	public void setIsDownloading(boolean isDownloading) {
 		this.isDownloading = isDownloading;
+	}
+	
+	public int getDownloadCancelCount() {
+		return downloadCancelCount;
+	}
+
+	public void setDownloadCancelCount(int downloadCancelCount) {
+		this.downloadCancelCount = downloadCancelCount;
 	}
 	
 

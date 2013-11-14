@@ -2,22 +2,15 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:orientation="vertical" 
-    android:background="#FF888888"
-    android:paddingTop="3dp"
-    android:paddingLeft="3dp"
-    android:paddingRight="3dp"
-    android:paddingBottom="3dp">
+    android:padding="5dp" >
     
     <ImageView
         android:id="@+id/parent_item_image"
-        android:layout_width="150px"
-        android:layout_height="150px"
+        android:layout_width="200px"
+        android:layout_height="200px"
         android:layout_marginBottom="10px"
-        android:adjustViewBounds = "true"
-        android:background="#000000"
-      
-        >
+        android:adjustViewBounds = "true" >
+        
     </ImageView>
     
 

@@ -4,7 +4,6 @@ package com.karbens.edetailing;
 import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-
 import com.karbens.application.EdetailingApplication;
 import com.karbens.listeners.ContentDownloadListener;
 import com.karbens.listeners.DownloadProgressListener;
@@ -16,7 +15,6 @@ import com.karbens.parser.ContentParser;
 import com.karbens.utility.DataManager;
 import com.karbens.utility.Database;
 import com.karbens.utility.HttpUtil;
-
 import android.opengl.Visibility;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -62,12 +60,6 @@ public class ContentManagerActivity extends Activity implements ContentDownloadL
     ArrayList<Child> mChildArr = null;
     ContentDownloadListener mListener = null;
     ImageAdapter mAdapter = null;
-    
-    //for progress bar
-    private static int myProgressWaited=0;
-    private Runnable myThread ;
-	//private int progressStatus=0;
-	private Handler myHandler=new Handler();
 	boolean proStatus=false;
 	
 	private int counter=0;
@@ -85,7 +77,6 @@ public class ContentManagerActivity extends Activity implements ContentDownloadL
 			mDataManager=new DataManager(this);
 		}
 		
-		//progressbar
 	
 		// Instance of ImageAdapter Class
 		mAdapter = new ImageAdapter(this);
@@ -106,7 +97,7 @@ public class ContentManagerActivity extends Activity implements ContentDownloadL
 
 		@Override
 		public int getCount() {
-			if(EdetailingApplication.mBrandArr==null)
+			if(EdetailingApplication.mBrandArr==null || EdetailingApplication.mBrandArr.size() == 0)
 			{
 				return 0;
 			}
@@ -145,52 +136,64 @@ public class ContentManagerActivity extends Activity implements ContentDownloadL
         	
         	final Button pauseButton = (Button) layout.findViewById(R.id.pauseBtn);
         	
-        	myProgressWaited=0;
 	        progressBar=(ProgressBar)layout.findViewById(R.id.player_exp_bar);
 	        
 	        int contentSize = EdetailingApplication.mBrandArr.get(0).getmContentArr().get(position).getContentSize();
 	        
-	        int progressValue = EdetailingApplication.mBrandArr.get(0).getmContentArr().get(position).getProgressValue();
+	        int progressValue = 0;//EdetailingApplication.mBrandArr.get(0).getmContentArr().get(position).getProgressValue();
 	        
-	        if(EdetailingApplication.mBrandArr.get(0).getmContentArr().get(position).getIsDownloading() == true)
-	        {
-	        	progressBar.setVisibility(View.VISIBLE);
-	        	pauseButton.setVisibility(View.VISIBLE);
-	        	resumeDwnBtn.setVisibility(View.INVISIBLE);
-	        	downloadbutton.setVisibility(View.INVISIBLE);
-	        }
-	        else
-	        {
-	        	if(EdetailingApplication.mBrandArr.get(0).getmContentArr().get(position).getDownloadStatus() == 0)
+	        	if(EdetailingApplication.mBrandArr.get(0).getmContentArr().get(position).getIsDownloading() == true)
 		        {
-		        	progressBar.setVisibility(View.INVISIBLE);//(View.INVISIBLE);
-					downloadbutton.setVisibility(View.VISIBLE);
-					resumeDwnBtn.setVisibility(View.INVISIBLE);
-					pauseButton.setVisibility(View.INVISIBLE);
+	        		
+	        		System.out.println("Downlaoded Size: "+EdetailingApplication.mBrandArr.get(0).getmContentArr().get(position).getDownloadedSize());
+	    	        System.out.println("Progress Size: "+EdetailingApplication.mBrandArr.get(0).getmContentArr().get(position).getProgressValue());
+	        		
+	        		if(EdetailingApplication.mBrandArr.get(0).getmContentArr().get(position).getDownloadStatus() == 2)
+	        		{
+	        			progressValue = EdetailingApplication.mBrandArr.get(0).getmContentArr().get(position).getProgressValue() + EdetailingApplication.mBrandArr.get(0).getmContentArr().get(position).getDownloadedSize();
+	        		}
+	        		else
+	        		{
+	        			progressValue = EdetailingApplication.mBrandArr.get(0).getmContentArr().get(position).getProgressValue();
+	        		}
+	        		
+		        	progressBar.setVisibility(View.VISIBLE);
+		        	pauseButton.setVisibility(View.VISIBLE);
+		        	resumeDwnBtn.setVisibility(View.INVISIBLE);
+		        	downloadbutton.setVisibility(View.INVISIBLE);
 		        }
-		        else if(EdetailingApplication.mBrandArr.get(0).getmContentArr().get(position).getDownloadStatus() == 1)
+		        else
 		        {
-		        	progressBar.setVisibility(View.INVISIBLE);
-					downloadbutton.setVisibility(View.INVISIBLE);
-					resumeDwnBtn.setVisibility(View.INVISIBLE);
-					pauseButton.setVisibility(View.INVISIBLE);
+		        	if(EdetailingApplication.mBrandArr.get(0).getmContentArr().get(position).getDownloadStatus() == 0)
+			        {
+		        		progressValue = 0;//EdetailingApplication.mBrandArr.get(0).getmContentArr().get(position).getDownloadedSize();
+		        		
+			        	progressBar.setVisibility(View.INVISIBLE);
+						downloadbutton.setVisibility(View.VISIBLE);
+						resumeDwnBtn.setVisibility(View.INVISIBLE);
+						pauseButton.setVisibility(View.INVISIBLE);
+			        }
+			        else if(EdetailingApplication.mBrandArr.get(0).getmContentArr().get(position).getDownloadStatus() == 1)
+			        {
+			        	progressBar.setVisibility(View.INVISIBLE);
+						downloadbutton.setVisibility(View.INVISIBLE);
+						resumeDwnBtn.setVisibility(View.INVISIBLE);
+						pauseButton.setVisibility(View.INVISIBLE);
+			        }
+			        else if(EdetailingApplication.mBrandArr.get(0).getmContentArr().get(position).getDownloadStatus() == 2)
+			        {
+			        	progressValue = EdetailingApplication.mBrandArr.get(0).getmContentArr().get(position).getDownloadedSize();
+			        	
+			        	progressBar.setVisibility(View.INVISIBLE);
+						downloadbutton.setVisibility(View.INVISIBLE);
+						resumeDwnBtn.setVisibility(View.VISIBLE);
+						pauseButton.setVisibility(View.INVISIBLE);
+			        }
 		        }
-		        else if(EdetailingApplication.mBrandArr.get(0).getmContentArr().get(position).getDownloadStatus() == 2)
-		        {
-		        	progressBar.setVisibility(View.INVISIBLE);
-					downloadbutton.setVisibility(View.INVISIBLE);
-					resumeDwnBtn.setVisibility(View.VISIBLE);
-					pauseButton.setVisibility(View.INVISIBLE);
-		        }
-	        }
 	        
-	        
-	        	
 	        
 	        if(contentSize != 0)
 	        {
-	        	
-		        
 		        System.out.println("progressValue :"+progressValue);
 
 		        System.out.println("contentSize :"+contentSize);
@@ -200,7 +203,6 @@ public class ContentManagerActivity extends Activity implements ContentDownloadL
 		        
 				progressBar.setMax(contentSize);
 
-				
 	        }
 	        			
 			
@@ -235,7 +237,7 @@ public class ContentManagerActivity extends Activity implements ContentDownloadL
 			        resumeDwnBtn.setVisibility(View.VISIBLE);
 			        progressBar.setVisibility(View.VISIBLE);
 			        
-					Toast.makeText(mContext, "Cancel download", Toast.LENGTH_LONG).show();
+					//Toast.makeText(mContext, "Cancel download", Toast.LENGTH_LONG).show();
 					
 					EdetailingApplication.mBrandArr.get(0).getmContentArr().get(index).setIsDownloading(false);
 					// Cancel all current downloads for this content
@@ -243,9 +245,6 @@ public class ContentManagerActivity extends Activity implements ContentDownloadL
 					{
 						EdetailingApplication.mBrandArr.get(0).getmContentArr().get(index).getmDwnContentArr().get(i).cancel(true);
 					}
-					
-					// Now insert whatever has been downloaded
-					
 					
 				}
 			});
@@ -328,21 +327,13 @@ public class ContentManagerActivity extends Activity implements ContentDownloadL
 
 	@Override
 	public void updateDownloadProgress(int contentId, long totalread) {
-		
-		
-		//System.out.println("Total Read :"+totalread);
-		//EdetailingApplication.mBrandArr.get(0).getmContentArr().get(contentId).setProgressValue(EdetailingApplication.mBrandArr.get(0).getmContentArr().get(contentId).getProgressValue()+(int)totalread);
-		
-		
-		//mAdapter.notifyDataSetChanged();
+
 	}
 
 
 	@Override
 	public void allDownloadComplete(int contentIndex) 
 	{
-		// TODO Auto-generated method stub
-		//EdetailingApplication.mBrandArr.get(0).getmContentArr().get(contentIndex).setDownloadStatus(1);
 		EdetailingApplication.mBrandArr.get(0).getmContentArr().get(contentIndex).setIsDownloading(false);
 		mAdapter.notifyDataSetChanged();
 	}

@@ -48,6 +48,9 @@ public class ParentGridActivity extends Activity{
 			contentIndex = b.getInt("contentindex");
 		}
 		
+		mParentArr = new ArrayList<Parent>();
+		mParentArr = EdetailingApplication.mBrandArr.get(brandIndex).getmContentArr().get(contentIndex).getmParentArr();
+		
 		GridView gridView = (GridView) findViewById(R.id.parent_View);
 		
 		// Instance of ImageAdapter Class
@@ -79,7 +82,7 @@ public class ParentGridActivity extends Activity{
         		goToPresentation();
         		
         	
-        		
+        		break;
         	case R.id.EditParents:
         		//Refresh list
         		
@@ -90,7 +93,7 @@ public class ParentGridActivity extends Activity{
         		//MenuItem saveItem = (MenuItem) findViewById(R.id.SaveParents);
         		//saveItem.setVisible(true);
         		
-        		
+        		break;
         		
         	case R.id.SaveParents:
         		//View Presentation
@@ -103,13 +106,13 @@ public class ParentGridActivity extends Activity{
         		
         		saveParents();
         		
-        		
+        		break;
         	default:
-            	return super.onOptionsItemSelected(item);
+            	//return super.onOptionsItemSelected(item);
         }
         
 		
-		//return super.onOptionsItemSelected(item);
+		return super.onOptionsItemSelected(item);
 	}
 	
 
@@ -130,20 +133,14 @@ public class ParentGridActivity extends Activity{
 	{
 		// TODO Auto-generated method stub
 		
-		mParentArr = new ArrayList<Parent>();
-		
-		for(int i=0;i<EdetailingApplication.mBrandArr.get(brandIndex).getmContentArr().get(contentIndex).getmParentArr().size();i++)
+		for(int i=0;i<mParentArr.size();i++)
 		{
-			mParent = EdetailingApplication.mBrandArr.get(brandIndex).getmContentArr().get(contentIndex).getmParentArr().get(i);
+			mParent = mParentArr.get(i);
 			
-			if(mParent.getIsDisabled() == false)
-			{
-				mParentArr.add(mParent);
-			}
+			EdetailingApplication.mBrandArr.get(brandIndex).getmContentArr().get(contentIndex).getmParentArr().get(i).setIsDisabled(mParent.getIsDisabled());
 			
 		}
 		
-		EdetailingApplication.mParentArr = mParentArr;
 	}
 
 
@@ -159,9 +156,9 @@ public class ParentGridActivity extends Activity{
 		@Override
 		public int getCount() 
 		{
-			if(EdetailingApplication.mBrandArr.get(brandIndex).getmContentArr().get(contentIndex).getmParentArr().size()!=0)  
+			if(mParentArr.size()!=0)  
 			{
-				return EdetailingApplication.mBrandArr.get(brandIndex).getmContentArr().get(contentIndex).getmParentArr().size();  
+				return mParentArr.size();  
 			}
 			else
 			{
@@ -173,7 +170,7 @@ public class ParentGridActivity extends Activity{
 		@Override
 		public Object getItem(int position) 
 		{
-			return EdetailingApplication.mBrandArr.get(brandIndex).getmContentArr().get(contentIndex).getmParentArr().get(position);  
+			return mParentArr.get(position);  
 		}
 
 		@Override
@@ -195,9 +192,9 @@ public class ParentGridActivity extends Activity{
         	
         	//imgView.setBackgroundResource((int)EdetailingApplication.mBrandArr.get(brandIndex).getmContentArr().get(contentIndex).getmParentArr().get(position).getmSlideBgPath());
         	
-        	System.out.println("local Path : "+EdetailingApplication.mBrandArr.get(brandIndex).getmContentArr().get(contentIndex).getmParentArr().get(position).getmSlideBgPath());
+        	System.out.println("local Path : "+mParentArr.get(position).getmSlideBgPath());
         
-        	File imgFile = new  File(EdetailingApplication.mBrandArr.get(brandIndex).getmContentArr().get(contentIndex).getmParentArr().get(position).getmSlideBgPath());
+        	File imgFile = new  File(mParentArr.get(position).getmSlideBgPath());
         	
         	if(imgFile.exists())
         	{
@@ -217,17 +214,17 @@ public class ParentGridActivity extends Activity{
 							
 					if(isEditMode == true)
 					{
-						mParent = EdetailingApplication.mBrandArr.get(brandIndex).getmContentArr().get(contentIndex).getmParentArr().get(index);
+						mParent = mParentArr.get(index);
 						
 						if(mParent.getIsDisabled() == true) // disabled
 						{
 							
-							EdetailingApplication.mBrandArr.get(brandIndex).getmContentArr().get(contentIndex).getmParentArr().get(index).setIsDisabled(false);
+							mParentArr.get(index).setIsDisabled(false);
 							imgView.setAlpha(1f);
 						}
 						else // enabled
 						{
-							EdetailingApplication.mBrandArr.get(brandIndex).getmContentArr().get(contentIndex).getmParentArr().get(index).setIsDisabled(true);
+							mParentArr.get(index).setIsDisabled(true);
 							imgView.setAlpha(0.5f);
 						}
 					}

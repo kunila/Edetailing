@@ -29,13 +29,22 @@ public class Parent implements Parcelable {
 		this.cId = cId;
 	}
 	
-	public long getmId() {
+	 public boolean getIsDisabled() {
+	 	 return isDisabled;
+	 }
+
+	public void setIsDisabled(boolean isDisabled) {
+		 this.isDisabled = isDisabled;
+	}
+
+	public int getmId() {
 		return mId;
 	}
 
 	public void setmId(int mId) {
 		this.mId = mId;
 	}
+	
 	
 	public String getmName() {
 		return mName;
@@ -158,16 +167,6 @@ public class Parent implements Parcelable {
 		// TODO Auto-generated constructor stub
 		//mChildArr = new ArrayList<Child>();
 	}
-
-
-	public boolean getIsDisabled() {
-		  return isDisabled;
-		 }
-
-		 public void setIsDisabled(boolean isDisabled) {
-		  this.isDisabled = isDisabled;
-		 }
-	
 
 
 	

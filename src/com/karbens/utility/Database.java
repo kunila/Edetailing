@@ -56,6 +56,8 @@ public class Database extends SQLiteOpenHelper {
 	private static final String C_FK = "brand_id";
 	private static final String C_DOWNLOADDATE = "down_date";
 	private static final String C_DOWNLOADSTATUS = "down_status";
+	private static final String C_DOWNLOADEDSIZE = "down_size";
+	private static final String C_CONTENTSIZE = "content_size";
 
 
 	// Child table column names
@@ -88,6 +90,10 @@ public class Database extends SQLiteOpenHelper {
 			+ C_DOWNLOADDATE
 			+ " TEXT,"
 			+ C_ID
+			+ " INTEGER,"
+			+ C_DOWNLOADEDSIZE
+			+ " INTEGER,"
+			+ C_CONTENTSIZE
 			+ " INTEGER,"
 			+ C_DOWNLOADSTATUS
 			+ " INTEGER,"
@@ -219,7 +225,7 @@ public class Database extends SQLiteOpenHelper {
 		SQLiteDatabase db = this.getReadableDatabase();
 
 		String selectQuery = "SELECT  * FROM " + TABLE_PARENT + " WHERE "
-				+ "pid" + " = " + Id ; // P_NAME;
+				+ "pid" + " = " + Id;
 
 		Cursor c = db.rawQuery(selectQuery, null);
 		Parent p = null;
@@ -276,6 +282,39 @@ public class Database extends SQLiteOpenHelper {
 		db.close();
 		return parents;
 	}
+	
+	/*
+	 * getting all parents
+	 */
+	public List<Parent> getParents(int contentId) {
+		List<Parent> parents = new ArrayList<Parent>();
+		String selectQuery = "SELECT  * FROM " + TABLE_PARENT + " WHERE "
+				+ "content_id" + " = " + contentId;
+
+		SQLiteDatabase db = this.getReadableDatabase();
+		Cursor c = db.rawQuery(selectQuery, null);
+
+		// looping through all rows and adding to list
+
+		if (c.moveToFirst()) {
+			do {
+				Parent p = new Parent();
+				p.setmHas_child(c.getInt(c.getColumnIndex(P_ID)));
+				p.setmName((c.getString(c.getColumnIndex(P_NAME))));
+				p.setmContentUrl((c.getString(c.getColumnIndex(P_CONTENTURL))));
+				p.setmHas_child(c.getInt(c.getColumnIndex(P_HASCHILD)));
+				p.setmParentViewTime(c.getString(c
+						.getColumnIndex(P_PARENTVIEWTIME)));
+				p.setmSlideBgPath(c.getString(c.getColumnIndex(P_SLIDEBGPATH)));
+				p.setmTimeInterval(c.getInt(c.getColumnIndex(P_TIMEINTERVAL)));
+
+				// adding to Parent list
+				parents.add(p);
+			} while (c.moveToNext());
+		}
+		db.close();
+		return parents;
+	}
 
 	/*
 	 * Updating a Parent
@@ -293,9 +332,13 @@ public class Database extends SQLiteOpenHelper {
 		values.put(P_TIMEINTERVAL, parent.getmTimeInterval());
 
 		// updating row
+		
+		int update = db.update(TABLE_PARENT, values, P_ID + " = ?",
+				new String[] { String.valueOf(parent.getmId()) }); 
+		
 		db.close();
-		return db.update(TABLE_PARENT, values, P_NAME + " = ?",
-				new String[] { String.valueOf(parent.getmName()) });
+		
+		return update;
 	}
 
 	/*
@@ -303,8 +346,8 @@ public class Database extends SQLiteOpenHelper {
 	 */
 	public void deleteParent(Parent p) {
 		SQLiteDatabase db = this.getWritableDatabase();
-		db.delete(TABLE_PARENT, P_NAME + " = ?",
-				new String[] { String.valueOf(p.getmName()) });
+		db.delete(TABLE_PARENT, P_ID + " = ?",
+				new String[] { String.valueOf(p.getmId()) });
 	}
 
 	/* creating a content */
@@ -317,6 +360,8 @@ public class Database extends SQLiteOpenHelper {
 		values.put(C_ID, content.getmId());
 		values.put(C_FK, content.getbId());
 		values.put(C_DOWNLOADDATE, content.getLastDownloadDate());
+		values.put(C_DOWNLOADEDSIZE, content.getDownloadedSize());
+		values.put(C_CONTENTSIZE, content.getContentSize());
 		values.put(C_DOWNLOADSTATUS, content.getDownloadStatus());
 
 		Log.d("name", content.getmName());
@@ -353,6 +398,10 @@ public class Database extends SQLiteOpenHelper {
 			content = new Content();
 			content.setmName((c.getString(c.getColumnIndex(C_NAME))));
 			content.setmId(c.getInt(c.getColumnIndex(C_ID)));
+			content.setLastDownloadDate((c.getString(c.getColumnIndex(C_DOWNLOADDATE)))); 
+			content.setDownloadStatus(c.getInt(c.getColumnIndex(C_DOWNLOADSTATUS)));
+			content.setDownloadedSize(c.getInt(c.getColumnIndex(C_DOWNLOADEDSIZE)));
+			content.setContentSize(c.getInt(c.getColumnIndex(C_CONTENTSIZE)));
 		}
 		db.close();
 		return content;
@@ -361,7 +410,8 @@ public class Database extends SQLiteOpenHelper {
 	/*
 	 * getting all Contents
 	 */
-	public List<Content> getAllContents() {
+	public List<Content> getAllContents() 
+	{
 		List<Content> contents = new ArrayList<Content>();
 		String selectQuery = "SELECT  * FROM " + TABLE_CONTENT;
 
@@ -374,7 +424,41 @@ public class Database extends SQLiteOpenHelper {
 				Content content = new Content();
 				content.setmName((c.getString(c.getColumnIndex(C_NAME))));
 				content.setmId(c.getInt(c.getColumnIndex(C_ID)));
+				content.setLastDownloadDate((c.getString(c.getColumnIndex(C_DOWNLOADDATE)))); 
+				content.setDownloadStatus(c.getInt(c.getColumnIndex(C_DOWNLOADSTATUS)));
+				content.setDownloadedSize(c.getInt(c.getColumnIndex(C_DOWNLOADEDSIZE)));
+				content.setContentSize(c.getInt(c.getColumnIndex(C_CONTENTSIZE)));
+				
+				contents.add(content);
+			} while (c.moveToNext());
+		}
+		db.close();
+		return contents;
+	}
+	
+	/*
+	 * getting all Contents for a brand
+	 */
+	public List<Content> getContents(int brandId) 
+	{
+		List<Content> contents = new ArrayList<Content>();
+		String selectQuery = "SELECT  * FROM " + TABLE_CONTENT + " WHERE "
+				+ "brand_id" + " = " + brandId+ " AND "+C_DOWNLOADSTATUS+" = 1";
 
+		SQLiteDatabase db = this.getReadableDatabase();
+		Cursor c = db.rawQuery(selectQuery, null);
+
+		// looping through all rows and adding to list
+		if (c.moveToFirst()) {
+			do {
+				Content content = new Content();
+				content.setmName((c.getString(c.getColumnIndex(C_NAME))));
+				content.setmId(c.getInt(c.getColumnIndex(C_ID)));
+				content.setLastDownloadDate((c.getString(c.getColumnIndex(C_DOWNLOADDATE)))); 
+				content.setDownloadStatus(c.getInt(c.getColumnIndex(C_DOWNLOADSTATUS)));
+				content.setDownloadedSize(c.getInt(c.getColumnIndex(C_DOWNLOADEDSIZE)));
+				content.setContentSize(c.getInt(c.getColumnIndex(C_CONTENTSIZE)));
+				
 				contents.add(content);
 			} while (c.moveToNext());
 		}
@@ -392,11 +476,16 @@ public class Database extends SQLiteOpenHelper {
 
 		values.put(C_NAME, content.getmName());
 		values.put(C_ID, content.getmId());
+		values.put(C_DOWNLOADDATE, content.getLastDownloadDate());
+		values.put(C_DOWNLOADSTATUS, content.getDownloadStatus());
+		values.put(C_DOWNLOADEDSIZE, content.getDownloadedSize());
 
 		// updating row
-		
-		return db.update(TABLE_CONTENT, values, C_ID + " = ?",
+		int update = db.update(TABLE_CONTENT, values, C_ID + " = ?",
 				new String[] { String.valueOf(content.getmId()) });
+		
+		db.close();
+		return update;
 	}
 
 	/*
@@ -500,6 +589,40 @@ public class Database extends SQLiteOpenHelper {
 		db.close();
 		return children;
 	}
+	
+	/*
+	 * getting all Children
+	 */
+	public List<Child> getChilds(int parentId) {
+		List<Child> children = new ArrayList<Child>();
+		String selectQuery = "SELECT  * FROM " + TABLE_CHILD + " WHERE "
+				+ "parent_id" + " = " + parentId;
+
+		SQLiteDatabase db = this.getReadableDatabase();
+		Cursor c = db.rawQuery(selectQuery, null);
+
+		// looping through all rows and adding to list
+		if (c.moveToFirst()) {
+			do {
+				Child ch = new Child();
+				ch.setmID(c.getInt(c.getColumnIndex(CH_ID)));
+				ch.setmName((c.getString(c.getColumnIndex(CH_NAME))));
+				ch.setmContentUrl((c.getString(c.getColumnIndex(CH_CONTENTURL))));
+				ch.setmChildViewTime(c.getString(c
+						.getColumnIndex(CH_CHILDVIEWTIME)));
+				ch.setmFilePath(c.getString(c.getColumnIndex(CH_FILEPATH)));
+				//ch.setmIsAnimated(Boolean.parseBoolean(c.getString(c.getColumnIndex(CH_MISANIMATED))));
+				//ch.setmAnimPath(c.getInt(c.getColumnIndex(CH_MANIMPATH)));
+				ch.setmTimeInterval(c.getInt(c.getColumnIndex(CH_TIMEINTERVAL)));
+				ch.setmType(c.getInt(c.getColumnIndex(CH_TYPE)));
+
+				// adding to todo list
+				children.add(ch);
+			} while (c.moveToNext());
+		}
+		db.close();
+		return children;
+	}
 
 	/*
 	 * Updating a child
@@ -521,9 +644,14 @@ public class Database extends SQLiteOpenHelper {
 		//values.put(CH_FK, child.getpID());
 
 		// updating row
+		
+		
+		int update = db.update(TABLE_CHILD, values, CH_ID + " = ?",
+				new String[] { String.valueOf(child.getmID()) });
+		
 		db.close();
-		return db.update(TABLE_CHILD, values, CH_NAME + " = ?",
-				new String[] { String.valueOf(child.getmName()) });
+		
+		return update;
 
 	}
 
@@ -532,8 +660,8 @@ public class Database extends SQLiteOpenHelper {
 	 */
 	public void deleteChild(Child child) {
 		SQLiteDatabase db = this.getWritableDatabase();
-		db.delete(TABLE_CHILD, CH_NAME + " = ?",
-				new String[] { String.valueOf(child.getmName()) });
+		db.delete(TABLE_CHILD, CH_ID + " = ?",
+				new String[] { String.valueOf(child.getmID()) });
 	}
 
 	public long createBrand(Brand brand) {
@@ -616,8 +744,8 @@ public class Database extends SQLiteOpenHelper {
 		values.put(B_ID, brand.getmId());
 
 		// updating row
-		return db.update(TABLE_BRAND, values, B_NAME + " = ?",
-				new String[] { String.valueOf(brand.getmName()) });
+		return db.update(TABLE_BRAND, values, B_ID + " = ?",
+				new String[] { String.valueOf(brand.getmId()) });
 	}
 
 	/*
@@ -625,8 +753,8 @@ public class Database extends SQLiteOpenHelper {
 	 */
 	public void deleteBrand(Brand brand) {
 		SQLiteDatabase db = this.getWritableDatabase();
-		db.delete(TABLE_BRAND, B_NAME + " = ?",
-				new String[] { String.valueOf(brand.getmName()) });
+		db.delete(TABLE_BRAND, B_ID + " = ?",
+				new String[] { String.valueOf(brand.getmId()) });
 	}
 
 	// closing database

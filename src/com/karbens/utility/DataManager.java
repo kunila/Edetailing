@@ -1,7 +1,11 @@
 package com.karbens.utility;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.nio.channels.FileChannel;
 import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -21,6 +25,7 @@ import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
+import android.os.Environment;
 import android.widget.Toast;
 
 import com.karbens.application.EdetailingApplication;
@@ -55,21 +60,24 @@ public class DataManager {
 		mContext = (Context) listener;
 		isConnected = hasConnectivity();
 		
+		db = new Database(mContext);
+		
 		if(isConnected)
 		{
 			//check for updates available
 			getLatestContents = new GetLatestContents();
 			getLatestContents.execute(""+Constants.XML_URL+"?username=strides&password=strides123&date=&cid=");
+			System.out.println(""+Constants.XML_URL+"?username=strides&password=strides123&date=&cid=");
 		}
 		else
 		{
 			//show content from sqlite
-			db = new Database(mContext);
-		/*	List<Brand> brandData = db.getAllBrands();
-			List<Content> contentData = db.getAllContents();
-			List<Parent> parentData = db.getAllParents();
-			List<Child>childData = db.getAllChild();*/
-			Toast.makeText(mContext, "No Internet Connectivity", Toast.LENGTH_SHORT).show();
+			
+		
+			// Load array list from database  //
+			EdetailingApplication.mBrandArr = loadFromDb();
+			
+			//Toast.makeText(mContext, "No Internet Connectivity", Toast.LENGTH_SHORT).show();
 		}
 		
 	}
@@ -97,6 +105,46 @@ public class DataManager {
 	        return false;
 	     }
 	  }
+	 
+	 
+	 public ArrayList<Brand> loadFromDb()
+	 {
+		 
+		 ArrayList<Brand> brandArr = new ArrayList<Brand>();
+		 
+		 brandArr = (ArrayList<Brand>) db.getAllBrands();
+		 
+		 for(int i=0; i<brandArr.size(); i++)
+		 {
+			 Brand aBrand = brandArr.get(i);
+			 
+			 ArrayList<Content> contentArr  = new ArrayList<Content>();
+			 
+			 contentArr = (ArrayList<Content>) db.getContents(aBrand.getmId()); 
+			 
+			 for(int j=0; j<contentArr.size(); j++)
+			 {
+				Content aContent = contentArr.get(j);
+				
+				 ArrayList<Parent> parentArr = new ArrayList<Parent>();
+				 
+				 parentArr = (ArrayList<Parent>) db.getParents(aContent.getmId());
+				 
+				 for(int k=0; k<parentArr.size(); k++)
+				 {
+					 Parent aParent = parentArr.get(k);
+					 
+					 ArrayList<Child> childArr = new ArrayList<Child>();
+					 
+					 childArr = (ArrayList<Child>) db.getChilds(aParent.getmId());
+				 }
+				 
+			 }
+			 
+		 }
+		 
+		 return brandArr;
+	 }
 
 
 	public class GetLatestContents extends AsyncTask<String, Void, ArrayList<Brand>>
@@ -129,6 +177,40 @@ public class DataManager {
 			
 			}
 			//return xml;
+			
+			
+			for(int i =0; i<EdetailingApplication.mBrandArr.size(); i ++)
+			{
+				System.out.println("Brand :"+EdetailingApplication.mBrandArr.get(i).getmName());
+				
+				for(int j=0; j<EdetailingApplication.mBrandArr.get(i).getmContentArr().size(); j++)
+				{
+					System.out.println("Content :"+EdetailingApplication.mBrandArr.get(i).getmContentArr().get(j).getmName());
+					
+					long aContentId  =	EdetailingApplication.mBrandArr.get(i).getmContentArr().get(j).getmId();
+					Content bContent =	db.getContent(aContentId);
+				
+					if(bContent!=null)
+					{
+						// Content already exists in the DB
+						 System.out.println("Content already exists in the DB");
+						  
+						 EdetailingApplication.mBrandArr.get(i).getmContentArr().set(j, bContent);// Replace local content in place of parsed content
+					}
+					
+					
+					for(int k=0; k<EdetailingApplication.mBrandArr.get(i).getmContentArr().get(j).getmParentArr().size(); k++)
+					{
+						System.out.println("Parent :"+EdetailingApplication.mBrandArr.get(i).getmContentArr().get(j).getmParentArr().get(k).getmName());
+						
+						for(int l=0; l < EdetailingApplication.mBrandArr.get(i).getmContentArr().get(j).getmParentArr().get(k).getmChildArr().size(); l++)
+						{
+							System.out.println("Child :"+EdetailingApplication.mBrandArr.get(i).getmContentArr().get(j).getmParentArr().get(k).getmChildArr().get(l).getmName());
+						}
+					}
+				}
+				
+			}
 		
 			//System.out.println("Strin of xml :"+xml);
 			return EdetailingApplication.mBrandArr;
@@ -150,8 +232,7 @@ public class DataManager {
 	public int downloadData(Content content,int contIndex,int operationType)  
 	{
 		
-		//int totCount=0;
-		//contentIndex = contIndex;
+		EdetailingApplication.mBrandArr.get(0).getmContentArr().get(contIndex).setDownloadSize(0);
 		
 		ArrayList<DownloadContent> dwnCntArr = new ArrayList<DownloadContent> ();
 		
@@ -234,6 +315,7 @@ public class DataManager {
 										+ 1);
 					}
 					
+					
 				}
 				
 			}
@@ -250,6 +332,15 @@ public class DataManager {
 								.getmContentArr().get(contIndex)
 								.getContentSize()
 								+ 1);
+			}
+			else if(operationType == 1)
+			{
+				// Reset Progress value to 0
+				EdetailingApplication.mBrandArr
+				.get(0)
+				.getmContentArr()
+				.get(contIndex)
+				.setProgressValue(0);
 			}
 			
 		}
@@ -292,8 +383,8 @@ public class DataManager {
 			String fileName = params[1];
 			String folderName = params[2];
 			System.out.println("URL :"+downloadUrl);
-			System.out.println("FOLDER NAME :"+folderName);
-			System.out.println("FILE NAME :"+fileName);
+			//System.out.println("FOLDER NAME :"+folderName);
+			//System.out.println("FILE NAME :"+fileName);
 			
 			localDwnPth = HttpUtil.download(contentIndex,downloadUrl, fileName, folderName,operationType);
 			
@@ -309,7 +400,21 @@ public class DataManager {
 	    protected void onCancelled() {
 	    	// TODO Auto-generated method stub
 	    	EdetailingApplication.mBrandArr.get(0).getmContentArr().get(contentIndex).setDownloadStatus(2);
-	    	//insertContentToDB(aContent);
+	    	
+			String currentDateTimeString = DateFormat.getDateTimeInstance().format(new Date());
+			EdetailingApplication.mBrandArr.get(0).getmContentArr().get(contentIndex).setLastDownloadDate(currentDateTimeString);
+	    	
+	    	EdetailingApplication.mBrandArr.get(0).getmContentArr().get(contentIndex).setDownloadCancelCount(EdetailingApplication.mBrandArr.get(0).getmContentArr().get(contentIndex).getDownloadCancelCount()+1);
+	    	int cancelCount = EdetailingApplication.mBrandArr.get(0).getmContentArr().get(contentIndex).getDownloadCancelCount();
+	    	int downloadedCount = EdetailingApplication.mBrandArr.get(0).getmContentArr().get(contentIndex).getProgressValue();
+	    	
+	    	if((cancelCount + downloadedCount) == EdetailingApplication.mBrandArr.get(0).getmContentArr().get(contentIndex).getDownloadSize())
+	    	{
+	    		EdetailingApplication.mBrandArr.get(0).getmContentArr().get(contentIndex).setDownloadedSize(downloadedCount);
+	    		
+	    		insertContentToDB(contentIndex);
+	    	}
+	    	
 	    	System.out.println("Async Cancelled..");
 	    	super.onCancelled();
 	    }
@@ -320,33 +425,27 @@ public class DataManager {
 			
 			//Update the data structure with the local file path
 			
-			if(mType==0)
+			if(mType==0) // Parent
 			{
 				//System.out.println("Path to update :"+result);
 				
 				EdetailingApplication.mBrandArr.get(0).getmContentArr().get(contentIndex).getmParentArr().get(pIndex).setmSlideBgPath(result);
-				System.out.println("Updated to Data Structure :"+EdetailingApplication.mBrandArr.get(0).getmContentArr().get(contentIndex).getmParentArr().get(pIndex).getmSlideBgPath());
+				System.out.println("Updated to Parent Data Structure :"+EdetailingApplication.mBrandArr.get(0).getmContentArr().get(contentIndex).getmParentArr().get(pIndex).getmSlideBgPath());
 			}
-			else
+			else // Child
 			{
 				//System.out.println("Path to update :"+result);
 				
 				EdetailingApplication.mBrandArr.get(0).getmContentArr().get(contentIndex).getmParentArr().get(pIndex).getmChildArr().get(chIndex).setmFilePath(result);
-				System.out.println("Updated to Data Structure :"+EdetailingApplication.mBrandArr.get(0).getmContentArr().get(contentIndex).getmParentArr().get(pIndex).getmChildArr().get(chIndex).getmFilePath());
+				System.out.println("Updated to Child Data Structure :"+EdetailingApplication.mBrandArr.get(0).getmContentArr().get(contentIndex).getmParentArr().get(pIndex).getmChildArr().get(chIndex).getmFilePath());
 				
 					
 			}
 			
-			EdetailingApplication.mBrandArr
-			.get(0)
-			.getmContentArr()
-			.get(contentIndex)
-			.setProgressValue(
-					EdetailingApplication.mBrandArr.get(0)
-							.getmContentArr().get(contentIndex)
-							.getProgressValue()
-							+ 1);
 			
+			EdetailingApplication.mBrandArr.get(0).getmContentArr().get(contentIndex).setProgressValue(EdetailingApplication.mBrandArr.get(0).getmContentArr().get(contentIndex).getProgressValue()+1);
+			
+			System.out.println("Incremented Progress :"+EdetailingApplication.mBrandArr.get(0).getmContentArr().get(contentIndex).getProgressValue());
 			
 			
 			if(EdetailingApplication.mBrandArr.get(0).getmContentArr().get(contentIndex).getDownloadSize() == EdetailingApplication.mBrandArr.get(0).getmContentArr().get(contentIndex).getProgressValue())
@@ -355,9 +454,10 @@ public class DataManager {
 				String currentDateTimeString = DateFormat.getDateTimeInstance().format(new Date());
 				EdetailingApplication.mBrandArr.get(0).getmContentArr().get(contentIndex).setLastDownloadDate(currentDateTimeString);
 				EdetailingApplication.mBrandArr.get(0).getmContentArr().get(contentIndex).setDownloadStatus(1);
-				//EdetailingApplication.mBrandArr.get(0).getmContentArr().get(contentIndex).setIsDownloading(false);
 				
-				insertContentToDB(EdetailingApplication.mBrandArr.get(0).getmContentArr().get(contentIndex),contentIndex);
+				EdetailingApplication.mBrandArr.get(0).getmContentArr().get(contentIndex).setDownloadedSize(EdetailingApplication.mBrandArr.get(0).getmContentArr().get(contentIndex).getContentSize());
+				
+				insertContentToDB(contentIndex);
 			}
 	
 			mListener.downloadFinished();
@@ -366,242 +466,126 @@ public class DataManager {
 		}
 	}
 	
-	/*
-	public class DownloadParent extends AsyncTask<String, Void, String>
+
+	
+	private void insertContentToDB(int contentIndex) 
 	{
-		int parentIndex = 0;
-		int mType = 0;
-		Content aContent = null;
-		int contentIndex = 0;
-		String localDwnPth = "";
-		
-		public DownloadParent(int cntIndex,int pIndex,int type,Content content) // index - position,type - Parent/Child
-		{
-			parentIndex = pIndex; // Parent Index
-			mType = type;
-			aContent = content;
-			contentIndex = cntIndex;
-		}
-
-		@Override
-		protected String doInBackground(String... params) {
-
-			String downloadUrl = params[0];
-			String fileName = params[1];
-			String folderName = params[2];
-			
-			//localDwnPth=HttpUtil.download(contentIndex,downloadUrl, fileName, folderName,operationType);
-			
-			//if(localDwnPth!=null)
-			//{
-				//counterDownloads=counterDownloads+1;
-				//System.out.println("counter: "+counterDownloads);
-			//}
-			return localDwnPth;
-		}
-		
-	 
-		
-		@Override
-		protected void onPostExecute(String result) {
-			
-			//Update the data structure with the local file path
-			//String currentDateTimeString = DateFormat.getDateTimeInstance().format(new Date());
-			//EdetailingApplication.mBrandArr.get(0).getmContentArr().get(contentIndex).setLastDownloadDate(currentDateTimeString);
-			//EdetailingApplication.mBrandArr.get(0).getmContentArr().get(contentIndex).setDownloadStatus(1);
-			EdetailingApplication.mBrandArr.get(0).getmContentArr().get(contentIndex).getmParentArr().get(parentIndex).setmSlideBgPath(result);
-			System.out.println("updated "+EdetailingApplication.mBrandArr.get(0).getmContentArr().get(contentIndex).getmParentArr().get(parentIndex).getmSlideBgPath());
-	
-			mListener.downloadFinished();
-			
-			super.onPostExecute(result);
-		}
-		
-	
-		
-
-		private void insertContentToDB(Content aContent2) {
-
-			for (int i = 0; i < EdetailingApplication.mBrandArr.size(); i++) 
-			{
-				Brand aBrand = EdetailingApplication.mBrandArr.get(i);
-				long aBrandId = aBrand.getmId();
-				Brand bBrand =db.getBrand(aBrandId);
-				if(bBrand==null)
-				{
-					
-				long brandKey = db.createBrand(aBrand);
-				
-				for(int j = 0; j <EdetailingApplication.mBrandArr.get(i).getmContentArr().size(); j++)	
-				{
-					Content aContent = EdetailingApplication.mBrandArr.get(i).getmContentArr().get(j);
-					aContent.setbId(brandKey);
-					long aContentId  =	aContent.getmId();
-					Content bContent =	db.getContent(aContentId);
-					if(bContent==null)
-					{
-						long contentKey =db.createContent(aContent);
-					
-						for(int k = 0; k <EdetailingApplication.mBrandArr.get(i).getmContentArr().get(j).getmParentArr().size(); k++)	
-						{
-							
-							Parent aParent = EdetailingApplication.mBrandArr.get(i).getmContentArr().get(j).getmParentArr().get(k);
-							aParent.setcId(contentKey);
-							long aParentId = aParent.getmId();
-							//String aParentName = aParent.getmName();
-							Parent bParent = db.getParent(aParentId);
-							if(bParent==null)
-							{
-								long parentKey =db.createParent(aParent);
-								for (int l = 0; l < EdetailingApplication.mBrandArr.get(i).getmContentArr().get(j).getmParentArr().get(k).getmChildArr().size(); l++) 
-								{
-									
-									Child aChild = EdetailingApplication.mBrandArr.get(i).getmContentArr().get(j).getmParentArr().get(k).getmChildArr().get(l);
-									aChild.setpID(parentKey);
-									long aChildId = aChild.getmID();
-									Child bChild = db.getChild(aChildId);
-									if(bChild==null)
-										db.createChild(aChild);
-								}
-						 	}
-						  }
-					  }
-					
-				}
-				
-				}
-				
-				
-			}
-			
-		}
-		
-	}
-	*/
-	/*
-	public class DownloadChild extends AsyncTask<String, Void, String>
-	{
-		final int childIndex;
-		final int mParentIndex;
-		Content aContent = null;
-		int contentIndex = 0;
-		String localDwnPth = "";
-		
-		public DownloadChild(int cntIndex,int index,int parentIndex,Content content) // index - position,type - Parent/Child
-		{
-			childIndex = index;
-			mParentIndex = parentIndex;
-			aContent = content;
-			contentIndex = cntIndex;
-		}
-
-		@Override
-		protected String doInBackground(String... params) {
-		
-			String downloadUrl = params[0];
-			String fileName = params[1];
-			String fldName = params[2];
-
-			
-			//localDwnPth=HttpUtil.download(contentIndex,downloadUrl, fileName, fldName);
-			
-			
-			return localDwnPth;
-			
-		
-		}
-		
-		@Override
-		protected void onPostExecute(String result) {
-			
-			// update the data structure with the local file path
-			System.out.println("contentIndex :"+contentIndex+" mParentIndex: "+mParentIndex+ " position: "+ childIndex);
-			
-			EdetailingApplication.mBrandArr.get(0).getmContentArr().get(contentIndex).getmParentArr().get(mParentIndex).getmChildArr().get(childIndex).setmFilePath(result);
-						
-			mListener.downloadFinished();
-			//counterDownloads=counterDownloads+1;
-			//aContent.setDownloadCount(mParentIndex);
-			if(aContent.getmParentArr().get(aContent.getmParentArr().size()-1).getmChildArr().size() == childIndex)
-			{
-				//insertContentToDB(aContent);
-			}
-			
-			super.onPostExecute(result);
-		}
-		
-	
-		
-	}
-*/
-	
-	private void insertContentToDB(Content aContent,int contentIndex) {
 		
 		db = new Database(mContext);
-		
-		
-		for (int i = 0; i < EdetailingApplication.mBrandArr.size(); i++) 
-		{
-			Brand aBrand = EdetailingApplication.mBrandArr.get(i);
-			
-			
+
+		//for (int i = 0; i < EdetailingApplication.mBrandArr.size(); i++) 
+		//{
+			Brand aBrand = EdetailingApplication.mBrandArr.get(0);
+
 			long aBrandId = aBrand.getmId();
 			Brand bBrand =db.getBrand(aBrandId);
+			long brandKey = 0;
 			
 			if(bBrand==null)
 			{
+				brandKey = db.createBrand(aBrand);
+			}
+			else
+			{
+				System.out.println("Brand already exists in the DB");
+				db.updateBrand(aBrand);
+			}
 				
-				long brandKey = db.createBrand(aBrand);
-				
-				for(int j = 0; j <EdetailingApplication.mBrandArr.get(i).getmContentArr().size(); j++)	
-				{
-					aContent = EdetailingApplication.mBrandArr.get(i).getmContentArr().get(j);
+				//for(int j = 0; j <EdetailingApplication.mBrandArr.get(i).getmContentArr().size(); j++)	
+				//{
+					Content aContent;
+					aContent = EdetailingApplication.mBrandArr.get(0).getmContentArr().get(contentIndex);
 					aContent.setbId(brandKey);
 				
 					long aContentId  =	aContent.getmId();
 					Content bContent =	db.getContent(aContentId);
+					long contentKey = 0;
+					
 					if(bContent==null)
 					{
-						long contentKey =db.createContent(aContent);
+						contentKey =db.createContent(aContent);
+					}
+					else
+					{
+						// Content already exists in the DB
+						System.out.println("Content already exists in the DB CID :"+aContent.getmId());
+						
+						System.out.println("*** Content downloaded size :"+aContent.getDownloadedSize()+" ***");
+						
+						db.updateContent(aContent);
+					}
 					
-						for(int k = 0; k <EdetailingApplication.mBrandArr.get(i).getmContentArr().get(j).getmParentArr().size(); k++)	
+						for(int k = 0; k <EdetailingApplication.mBrandArr.get(0).getmContentArr().get(contentIndex).getmParentArr().size(); k++)	
 						{
-							
-							Parent aParent = EdetailingApplication.mBrandArr.get(i).getmContentArr().get(j).getmParentArr().get(k);
+							Parent aParent = EdetailingApplication.mBrandArr.get(0).getmContentArr().get(contentIndex).getmParentArr().get(k);
 							aParent.setcId(contentKey);
 							long aParentId = aParent.getmId();
-							//String aParentName = aParent.getmName();
+							long parentKey = 0;
 							Parent bParent = db.getParent(aParentId);
+							
 							if(bParent==null)
 							{
-								long parentKey =db.createParent(aParent);
-								for (int l = 0; l < EdetailingApplication.mBrandArr.get(i).getmContentArr().get(j).getmParentArr().get(k).getmChildArr().size(); l++) 
+								parentKey =db.createParent(aParent);
+							}
+							else
+							{
+								System.out.println("Parent already exists in the DB PID :"+aParent.getmId());
+								db.updateParent(aParent);
+							}
+							
+								for (int l = 0; l < EdetailingApplication.mBrandArr.get(0).getmContentArr().get(contentIndex).getmParentArr().get(k).getmChildArr().size(); l++) 
 								{
-									//contentCount
-									//aContent.setContentCount(EdetailingApplication.mBrandArr.get(i).getmContentArr().get(j).getmParentArr().size()+EdetailingApplication.mBrandArr.get(i).getmContentArr().get(j).getmParentArr().get(k).getmChildArr().size());
-									//System.out.println("count of content : "+aContent.getContentCount());
-									
-									Child aChild = EdetailingApplication.mBrandArr.get(i).getmContentArr().get(j).getmParentArr().get(k).getmChildArr().get(l);
+									Child aChild = EdetailingApplication.mBrandArr.get(0).getmContentArr().get(contentIndex).getmParentArr().get(k).getmChildArr().get(l);
 									aChild.setpID(parentKey);
 									long aChildId = aChild.getmID();
 									Child bChild = db.getChild(aChildId);
 									if(bChild==null)
+									{
 										db.createChild(aChild);
+									}
+									else
+									{
+										System.out.println("Child already exists in the DB CHID"+aChild.getmID());
+										db.updateChild(aChild);
+									}
+										
 								}
-						 	}
-						  }
-					  }
+						 	
+					    }
 					
-				}
-			
-			
-		  }
-			
-			
-		}
-		//aContent.setProgressCount(counterDownloads);
+						
+		copyDataBase();		
+						
 		mListener.allDownloadComplete(contentIndex);
 		
 	}
+	
+	 //for db copying temporary function
+	 public void copyDataBase() {
+	       System.out.println("in copy data base at finally");
+	        try {
+	            File sd = Environment.getExternalStorageDirectory();
+	            File data = Environment.getDataDirectory();
+	            if (sd.canWrite()) {
+	                String currentDBPath = "/data/" + mContext.getPackageName()
+	                        + "/databases/MyDay";
+	                String backupDBPath = "DB_29Apr.sqlite";
+	                File currentDB = new File(data, currentDBPath);
+	                File backupDB = new File(sd, backupDBPath);
+	                if (currentDB.exists()) {
+	                    FileChannel src = new FileInputStream(currentDB)
+	                            .getChannel();
+	                    FileChannel dst = new FileOutputStream(backupDB)
+	                            .getChannel();
+	                    dst.transferFrom(src, 0, src.size());
+	                    src.close();
+	                    dst.close();
+	                }
+	            }
+	        } catch (Exception e) {
+	            System.out.println("in copy of data base 10 ");
+
+	        }
+	    }
 	
 }

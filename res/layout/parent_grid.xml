@@ -11,7 +11,7 @@
 
 <GridView 
     android:id="@+id/parent_View"
-    android:layout_width="600dp"
+    android:layout_width="800dp"
     android:layout_height="wrap_content"
     android:numColumns="4"
     android:columnWidth="30dp"

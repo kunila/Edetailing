@@ -81,17 +81,8 @@ import com.viewpagerindicator.LinePageIndicator;
 
 @SuppressLint("ValidFragment")/**/
 public class ParentActivity extends FragmentActivity{
+
 	
-//	long img_array[] = {R.drawable.img1,R.drawable.img2,R.drawable.img3,R.drawable.img4,R.drawable.img5,R.drawable.img5_1,R.drawable.img5_2,R.drawable.img6,R.drawable.img7,R.drawable.img8,R.drawable.img8_1,R.drawable.img9,R.drawable.img10,
-//			            R.drawable.img11,R.drawable.img11_1,R.drawable.img11_2,R.drawable.img11_3,R.drawable.img11_4,R.drawable.img11_5,R.drawable.img11_6,/*R.drawable.img12,R.drawable.img13,R.drawable.img13_1,R.drawable.img13_2,R.drawable.img14,R.drawable.img15,R.drawable.img16,R.drawable.img16_1,R.drawable.img17,R.drawable.img18,R.drawable.img19,R.drawable.img20,
-//			            R.drawable.img21,R.drawable.img22,R.drawable.img22_1,R.drawable.img22_2,R.drawable.img23,R.drawable.img24,R.drawable.img25,R.drawable.img26,R.drawable.img27,R.drawable.img28,R.drawable.img29,R.drawable.img30,
-//			            R.drawable.img31,R.drawable.img32,R.drawable.img32_1,R.drawable.img33,R.drawable.img34,R.drawable.img35,R.drawable.img36,R.drawable.img37,R.drawable.img38,R.drawable.img39,R.drawable.img40,
-//			            R.drawable.img41,R.drawable.img42,R.drawable.img43,R.drawable.img44,R.drawable.img45,R.drawable.img46,R.drawable.img47,R.drawable.img48,R.drawable.img48_1,R.drawable.img49,R.drawable.img50,
-//			            R.drawable.img51,R.drawable.img52,R.drawable.img53,R.drawable.img54,R.drawable.img55,R.drawable.img55_1,R.drawable.img56,R.drawable.img57,R.drawable.img58,R.drawable.img59,R.drawable.img60,
-//			            R.drawable.img61,R.drawable.img61_1,R.drawable.img61_2,R.drawable.img61_3,R.drawable.img61_4,R.drawable.img61_5,R.drawable.img61_6,R.drawable.img62,R.drawable.img63,R.drawable.img64,R.drawable.img65,R.drawable.img65_1,R.drawable.img66,R.drawable.img67,R.drawable.img68,R.drawable.img69,R.drawable.img70,
-//			            R.drawable.img71,R.drawable.img71_1,R.drawable.img71_2,R.drawable.img72,R.drawable.img73,R.drawable.img74,R.drawable.img75,R.drawable.img76,R.drawable.img77,R.drawable.img78,R.drawable.img78_1,R.drawable.img78_2,R.drawable.img78_3,R.drawable.img78_4,R.drawable.img78_5,R.drawable.img78_6,R.drawable.img79,R.drawable.img80,
-//			            R.drawable.img81,R.drawable.img82,R.drawable.img83,R.drawable.img84,R.drawable.img85,R.drawable.img85_1,R.drawable.img86 */};
-//	
 	LinePageIndicator mIndicator = null;
 	ViewPager  mPager = null;
 	Button longPressExitBtn = null;
@@ -119,9 +110,6 @@ public class ParentActivity extends FragmentActivity{
     
     static final int SWIPE_MIN_DISTANCE = 120;
    
-    
-    //final static String TARGET_BASE_PATH = Environment.getExternalStorageDirectory();//"/sdcard/";
-    
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		
@@ -130,25 +118,26 @@ public class ParentActivity extends FragmentActivity{
 		Bundle b = getIntent().getExtras();
 		if(b!=null)
 		{
-			
-			//mContent =  b.getParcelable("content");
-			
+
 			brandIndex = b.getInt("brandindex");
 			contentIndex = b.getInt("contentindex");
 			
 			mContent = EdetailingApplication.mBrandArr.get(brandIndex).getmContentArr().get(contentIndex);
 			
+			for(int i = 0; i < mContent.getmParentArr().size(); i++)
+			{
+				if(mContent.getmParentArr().get(i).getIsDisabled() == false)
+				{
+					mParent = EdetailingApplication.mBrandArr.get(brandIndex).getmContentArr().get(contentIndex).getmParentArr().get(i);
+					mParentArr.add(mParent);
+				}
+			}
 		}
-		
-		
 		
 		System.out.println("Content Name: "+mContent.getmName());
 		
-		//Intent d = getIntent();
-		
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_parent);
-		
 		
 		dm = new DisplayMetrics();
         getWindowManager().getDefaultDisplay().getMetrics(dm);
@@ -156,11 +145,7 @@ public class ParentActivity extends FragmentActivity{
 		
         //1-Image,2-Video,3-Text,4-Reference button
         
-		//mIndicator= (LinePageIndicator) findViewById(R.id.indicator);
-        
-        //mLinearLay =  (RelativeLayout) findViewById(R.id.superLayout);
-        //RelativeLayout.LayoutParams mParams = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.FILL_PARENT,RelativeLayout.LayoutParams.FILL_PARENT);
-        //mParams.addRule(RelativeLayout.BELOW,slin.getId());
+		
         slin = (LinearLayout) findViewById(R.id.scrolllayout);
         hScroll = (HorizontalScrollView) findViewById(R.id.scrollLayout);
         
@@ -170,7 +155,7 @@ public class ParentActivity extends FragmentActivity{
 
         lin = (LinearLayout) findViewById(R.id.lin);
        
-        for (int i = 0; i <  mContent.getmParentArr().size(); i++) 
+        for (int i = 0; i <  mParentArr.size(); i++) 
         {
         	
         	final int index = i;
@@ -183,7 +168,7 @@ public class ParentActivity extends FragmentActivity{
 			//iv.setBackgroundResource(((Parent) mContent.getmParentArr().get(i)).getmSlideBgPath());
 	       // iv.setBackgroundDrawable(drawableImage);
 	        
-	    	File imgFile = new  File(EdetailingApplication.mBrandArr.get(brandIndex).getmContentArr().get(contentIndex).getmParentArr().get(index).getmSlideBgPath());
+	    	File imgFile = new  File(mParentArr.get(index).getmSlideBgPath());
 	    	if(imgFile.exists()){
 
 	    	    Bitmap myBitmap = BitmapFactory.decodeFile(imgFile.getAbsolutePath());
@@ -310,7 +295,7 @@ public class ParentActivity extends FragmentActivity{
 	       // imgV.setBackgroundDrawable(drawableImage);
         	
         	
-        	File imgFile = new  File(EdetailingApplication.mBrandArr.get(brandIndex).getmContentArr().get(contentIndex).getmParentArr().get(position).getmSlideBgPath());
+        	File imgFile = new  File(mParentArr.get(position).getmSlideBgPath());
         	if(imgFile.exists()){
 
         	    Bitmap myBitmap = BitmapFactory.decodeFile(imgFile.getAbsolutePath());
@@ -343,12 +328,12 @@ public class ParentActivity extends FragmentActivity{
 				}
             });
             
-            System.out.println("Index :"+position+"Child Count :"+mContent.getmParentArr().get(position).getmChildArr().size());
+            System.out.println("Index :"+position+"Child Count :"+mParentArr.get(position).getmChildArr().size());
             
-            for(int i=0;i<(mContent.getmParentArr().get(position).getmChildArr().size());i++)
+            for(int i=0;i<(mParentArr.get(position).getmChildArr().size());i++)
             {
             	
-            	final Child aChild = mContent.getmParentArr().get(position).getmChildArr().get(i);
+            	final Child aChild = mParentArr.get(position).getmChildArr().get(i);
             	
             	int tempChilId = Integer.parseInt(""+position+""+i); // not used
            
