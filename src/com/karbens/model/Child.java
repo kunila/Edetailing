@@ -16,10 +16,11 @@ public class Child implements Parcelable{
 	//private int mAnimPath = 0;
 	private int mTimeInterval = 0;
 	private int mType = 0;
-	private int mID = 0; // Framework Key
 	private String mText="";
 	private String mTextStyle="";
+	private int mID = 0; // Framework Key
 	private long pID = 0; // Parent Foreign Key
+	private long pkID = 0; // Primary Key
 	
 
 	public int getmID() {
@@ -30,6 +31,13 @@ public class Child implements Parcelable{
 		this.mID = mID;
 	}
 	
+	public long getPkID() {
+		return pkID;
+	}
+
+	public void setPkID(long pkID) {
+		this.pkID = pkID;
+	}
 
 	public long getpID() {
 		return pID;
@@ -159,7 +167,6 @@ public class Child implements Parcelable{
 	}
 	
 	
-
 	public static final Parcelable.Creator<Child> CREATOR=new Parcelable.Creator<Child>() 
 	{
 				

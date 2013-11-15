@@ -9,6 +9,8 @@ public class Parent implements Parcelable {
 	
 	private String mName = "";
 	private int mId = 0;
+	private long cId = 0; // Content foreign key
+	private long pkId = 0; // Parent primary key
 	private String mContentUrl = "";
 	private String mFrame = "";
 	public int mHas_child =0;
@@ -17,7 +19,7 @@ public class Parent implements Parcelable {
 	private String mSlideBgPath =  "";
 	private int mTimeInterval = 0;
 	public ArrayList<Child> mChildArr = new ArrayList<Child>();
-	private long cId = 0;
+	
 	private boolean isDisabled=false;
 	
 	
@@ -28,6 +30,15 @@ public class Parent implements Parcelable {
 	public void setcId(long cId) {
 		this.cId = cId;
 	}
+	
+	public long getPkId() {
+		return pkId;
+	}
+
+	public void setPkId(long pkId) {
+		this.pkId = pkId;
+	}
+
 	
 	 public boolean getIsDisabled() {
 	 	 return isDisabled;
@@ -168,6 +179,7 @@ public class Parent implements Parcelable {
 		//mChildArr = new ArrayList<Child>();
 	}
 
+	
 
 	
 	}

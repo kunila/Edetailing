@@ -43,15 +43,9 @@ public class DataManager {
 	static Parent aParent = null;
 	static Child aChild = null;
 	boolean isConnected = false;
-	Database db;
-	// downloadContent dwnContent  = null;
-	//DownloadParent dwnParent = null;
-	//DownloadChild dwnChild = null;
+	public Database db;
 	DownloadContent dwnContent = null;
-	//String localDwnPth="";
-	//int contentIndex=0;
 	ContentDownloadListener mListener = null;
-	//int counterDownloads =0;
 	int parentSize =0;
 	
 	public DataManager(ContentDownloadListener listener)
@@ -69,16 +63,7 @@ public class DataManager {
 			getLatestContents.execute(""+Constants.XML_URL+"?username=strides&password=strides123&date=&cid=");
 			System.out.println(""+Constants.XML_URL+"?username=strides&password=strides123&date=&cid=");
 		}
-		else
-		{
-			//show content from sqlite
-			
 		
-			// Load array list from database  //
-			EdetailingApplication.mBrandArr = loadFromDb();
-			
-			//Toast.makeText(mContext, "No Internet Connectivity", Toast.LENGTH_SHORT).show();
-		}
 		
 	}
 	
@@ -120,7 +105,7 @@ public class DataManager {
 			 
 			 ArrayList<Content> contentArr  = new ArrayList<Content>();
 			 
-			 contentArr = (ArrayList<Content>) db.getContents(aBrand.getmId()); 
+			 contentArr = (ArrayList<Content>) db.getContents(aBrand.getPkId()); 
 			 
 			 for(int j=0; j<contentArr.size(); j++)
 			 {
@@ -128,7 +113,7 @@ public class DataManager {
 				
 				 ArrayList<Parent> parentArr = new ArrayList<Parent>();
 				 
-				 parentArr = (ArrayList<Parent>) db.getParents(aContent.getmId());
+				 parentArr = (ArrayList<Parent>) db.getParents(aContent.getPkId());
 				 
 				 for(int k=0; k<parentArr.size(); k++)
 				 {
@@ -136,10 +121,16 @@ public class DataManager {
 					 
 					 ArrayList<Child> childArr = new ArrayList<Child>();
 					 
-					 childArr = (ArrayList<Child>) db.getChilds(aParent.getmId());
+					 childArr = (ArrayList<Child>) db.getChilds(aParent.getPkId());
+					 
+					 aParent.setmChildArr(childArr);
 				 }
 				 
+				 aContent.setmParentArr(parentArr);
+				 
 			 }
+			 
+			 aBrand.setmContentArr(contentArr);
 			 
 		 }
 		 
@@ -188,13 +179,31 @@ public class DataManager {
 					System.out.println("Content :"+EdetailingApplication.mBrandArr.get(i).getmContentArr().get(j).getmName());
 					
 					long aContentId  =	EdetailingApplication.mBrandArr.get(i).getmContentArr().get(j).getmId();
+					System.out.println("MID :"+aContentId);
+					
 					Content bContent =	db.getContent(aContentId);
 				
 					if(bContent!=null)
 					{
 						// Content already exists in the DB
 						 System.out.println("Content already exists in the DB");
+						 
+						 //Fetch all parent for this content
+						 ArrayList<Parent> mParentArr = new ArrayList<Parent>(); 
+						
+						 mParentArr = (ArrayList<Parent>) db.getParents(bContent.getPkId()); 
+						 
+						 for(int a=0;a< mParentArr.size(); a++)
+						 {
+							 Parent aParent = mParentArr.get(a);
+							 
+							 ArrayList<Child> mChildArr = new ArrayList<Child>();
+							 mChildArr = (ArrayList<Child>) db.getChilds(aParent.getPkId());
+							 aParent.setmChildArr(mChildArr);
+						 }
 						  
+						 bContent.setmParentArr(mParentArr);
+						 
 						 EdetailingApplication.mBrandArr.get(i).getmContentArr().set(j, bContent);// Replace local content in place of parsed content
 					}
 					

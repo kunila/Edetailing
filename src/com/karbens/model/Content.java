@@ -10,7 +10,7 @@ public class Content implements Parcelable{
 	 private String mName = "";
 	 private int mId =0; // framework ID
 	 private long bId =0; // Brand Foreign Key
-	 
+	 private long pkId =0; // Content Primary Key
 	 private int downloadStatus = 0;
 	 private String lastDownloadDate;
 	 
@@ -41,6 +41,14 @@ public class Content implements Parcelable{
 
 	public void setmId(int mId) {
 		this.mId = mId;
+	}
+	
+	public long getPkId() {
+		return pkId;
+	}
+
+	public void setPkId(long pkId) {
+		this.pkId = pkId;
 	}
 	
 	public String getmName() {
@@ -189,7 +197,4 @@ public class Content implements Parcelable{
 	}
 
 	
-
-	
-
 }

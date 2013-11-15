@@ -77,7 +77,17 @@ public class ContentManagerActivity extends Activity implements ContentDownloadL
 			mDataManager=new DataManager(this);
 		}
 		
-	
+		
+		if(mDataManager.hasConnectivity() == false)
+		{
+			//show content from sqlite
+			
+			// Load array list from database  //
+			EdetailingApplication.mBrandArr = mDataManager.loadFromDb();
+			
+			Toast.makeText(this, "No Internet Connectivity", Toast.LENGTH_SHORT).show();
+		}
+		
 		// Instance of ImageAdapter Class
 		mAdapter = new ImageAdapter(this);
 		gridView.setAdapter(mAdapter);

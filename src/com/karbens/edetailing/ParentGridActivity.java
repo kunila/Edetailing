@@ -3,6 +3,7 @@ package com.karbens.edetailing;
 import java.io.File;
 import java.util.ArrayList;
 import android.app.Activity;
+import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -33,6 +34,7 @@ public class ParentGridActivity extends Activity{
     int contentIndex = 0;
 	int brandIndex = 0;
 	boolean isEditMode = false;
+	boolean isSave = false;
     
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -77,32 +79,20 @@ public class ParentGridActivity extends Activity{
 		switch(item.getItemId()) 
         {
         	case R.id.ViewPresentation:
-        		//Refresh list
-        	
-        		goToPresentation();
         		
+        		goToPresentation();
         	
         		break;
         	case R.id.EditParents:
-        		//Refresh list
         		
         		isEditMode = true;
-        		
-        		//item.setVisible(false);
-        		
-        		//MenuItem saveItem = (MenuItem) findViewById(R.id.SaveParents);
-        		//saveItem.setVisible(true);
         		
         		break;
         		
         	case R.id.SaveParents:
-        		//View Presentation
+        		
         		isEditMode = false;
-        		
-        		//item.setVisible(false);
-        		
-        		//MenuItem editItem = (MenuItem) findViewById(R.id.EditParents);
-        		//editItem.setVisible(true);
+        		isSave = true;
         		
         		saveParents();
         		
@@ -110,11 +100,47 @@ public class ParentGridActivity extends Activity{
         	default:
             	//return super.onOptionsItemSelected(item);
         }
+		
+		invalidateOptionsMenu();
         
 		
 		return super.onOptionsItemSelected(item);
 	}
 	
+	@Override
+	public boolean onPrepareOptionsMenu(Menu menu) {
+		// TODO Auto-generated method stub
+		
+		 MenuItem editItem = menu.findItem(R.id.EditParents); 
+	     MenuItem saveItem = menu.findItem(R.id.SaveParents);
+	     MenuItem viewItem = menu.findItem(R.id.ViewPresentation);
+	     
+	     if(isEditMode==true) 
+	     {           
+	    	 saveItem.setVisible(true);
+	    	 viewItem.setVisible(false);
+	    	 editItem.setVisible(false);
+	      
+	     }
+	     else
+	     {
+		      if(isSave==true)
+		      {
+		    	  editItem.setVisible(true);
+		    	  viewItem.setVisible(true);
+		    	  saveItem.setVisible(false);
+		      }
+		      else
+		      {
+		    	  editItem.setVisible(true);
+		    	  saveItem.setVisible(false);
+		    	  viewItem.setVisible(true);
+		      }
+	     }
+		
+		return super.onPrepareOptionsMenu(menu);
+	
+	}
 
 	private void goToPresentation() 
 	{

@@ -220,7 +220,7 @@ public class ParentActivity extends FragmentActivity{
 		//mIndicator.
 	}
 
-
+/*
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		
@@ -231,7 +231,8 @@ public class ParentActivity extends FragmentActivity{
 		
 		
 	}
-
+*/
+	
 	private class ParentAdapter extends PagerAdapter implements View.OnTouchListener,OnGestureListener
 	{
       

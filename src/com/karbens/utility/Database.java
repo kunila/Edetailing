@@ -231,22 +231,22 @@ public class Database extends SQLiteOpenHelper {
 		Parent p = null;
 		if (c != null)
 		{
-			c.moveToFirst();
+			//c.moveToFirst();
 
-			
+			if(c.moveToFirst())
+			{
+				p = new Parent();
+				p.setmHas_child(c.getInt(c.getColumnIndex(P_ID)));
+				p.setmName((c.getString(c.getColumnIndex(P_NAME))));
+				p.setmContentUrl((c.getString(c.getColumnIndex(P_CONTENTURL))));
+				p.setmHas_child(c.getInt(c.getColumnIndex(P_HASCHILD)));
+				p.setmParentViewTime(c.getString(c.getColumnIndex(P_PARENTVIEWTIME)));
+				p.setmSlideBgPath(c.getString(c.getColumnIndex(P_SLIDEBGPATH)));
+				p.setmTimeInterval(c.getInt(c.getColumnIndex(P_TIMEINTERVAL)));
+				p.setPkId(c.getInt(c.getColumnIndex(KEY_ID)));
+			}
 		}
-		if(c.getCount() != 0)
-		{
-			p = new Parent();
-			p.setmHas_child(c.getInt(c.getColumnIndex(P_ID)));
-			p.setmName((c.getString(c.getColumnIndex(P_NAME))));
-			p.setmContentUrl((c.getString(c.getColumnIndex(P_CONTENTURL))));
-			p.setmHas_child(c.getInt(c.getColumnIndex(P_HASCHILD)));
-			p.setmParentViewTime(c.getString(c.getColumnIndex(P_PARENTVIEWTIME)));
-			p.setmSlideBgPath(c.getString(c.getColumnIndex(P_SLIDEBGPATH)));
-			p.setmTimeInterval(c.getInt(c.getColumnIndex(P_TIMEINTERVAL)));
-	
-		}
+		
 		db.close();
 		return p;
 	}
@@ -274,7 +274,7 @@ public class Database extends SQLiteOpenHelper {
 						.getColumnIndex(P_PARENTVIEWTIME)));
 				p.setmSlideBgPath(c.getString(c.getColumnIndex(P_SLIDEBGPATH)));
 				p.setmTimeInterval(c.getInt(c.getColumnIndex(P_TIMEINTERVAL)));
-
+				p.setPkId(c.getInt(c.getColumnIndex(KEY_ID)));
 				// adding to Parent list
 				parents.add(p);
 			} while (c.moveToNext());
@@ -286,7 +286,7 @@ public class Database extends SQLiteOpenHelper {
 	/*
 	 * getting all parents
 	 */
-	public List<Parent> getParents(int contentId) {
+	public List<Parent> getParents(long contentId) {
 		List<Parent> parents = new ArrayList<Parent>();
 		String selectQuery = "SELECT  * FROM " + TABLE_PARENT + " WHERE "
 				+ "content_id" + " = " + contentId;
@@ -303,11 +303,11 @@ public class Database extends SQLiteOpenHelper {
 				p.setmName((c.getString(c.getColumnIndex(P_NAME))));
 				p.setmContentUrl((c.getString(c.getColumnIndex(P_CONTENTURL))));
 				p.setmHas_child(c.getInt(c.getColumnIndex(P_HASCHILD)));
-				p.setmParentViewTime(c.getString(c
-						.getColumnIndex(P_PARENTVIEWTIME)));
+				p.setmParentViewTime(c.getString(c.getColumnIndex(P_PARENTVIEWTIME)));
 				p.setmSlideBgPath(c.getString(c.getColumnIndex(P_SLIDEBGPATH)));
 				p.setmTimeInterval(c.getInt(c.getColumnIndex(P_TIMEINTERVAL)));
-
+				p.setPkId(c.getInt(c.getColumnIndex(KEY_ID)));
+				
 				// adding to Parent list
 				parents.add(p);
 			} while (c.moveToNext());
@@ -390,19 +390,22 @@ public class Database extends SQLiteOpenHelper {
 		
 		if (c != null)
 		{
-			c.moveToFirst();
+			//c.moveToFirst();
+			
+			if(c.moveToFirst())
+			{
+				content = new Content();
+				content.setmName((c.getString(c.getColumnIndex(C_NAME))));
+				content.setmId(c.getInt(c.getColumnIndex(C_ID)));
+				content.setLastDownloadDate((c.getString(c.getColumnIndex(C_DOWNLOADDATE)))); 
+				content.setDownloadStatus(c.getInt(c.getColumnIndex(C_DOWNLOADSTATUS)));
+				content.setDownloadedSize(c.getInt(c.getColumnIndex(C_DOWNLOADEDSIZE)));
+				content.setContentSize(c.getInt(c.getColumnIndex(C_CONTENTSIZE)));
+				content.setPkId(c.getInt(c.getColumnIndex(KEY_ID)));
+			}
 		}
 		
-		if(c.getCount() != 0)
-		{
-			content = new Content();
-			content.setmName((c.getString(c.getColumnIndex(C_NAME))));
-			content.setmId(c.getInt(c.getColumnIndex(C_ID)));
-			content.setLastDownloadDate((c.getString(c.getColumnIndex(C_DOWNLOADDATE)))); 
-			content.setDownloadStatus(c.getInt(c.getColumnIndex(C_DOWNLOADSTATUS)));
-			content.setDownloadedSize(c.getInt(c.getColumnIndex(C_DOWNLOADEDSIZE)));
-			content.setContentSize(c.getInt(c.getColumnIndex(C_CONTENTSIZE)));
-		}
+		
 		db.close();
 		return content;
 	}
@@ -428,6 +431,7 @@ public class Database extends SQLiteOpenHelper {
 				content.setDownloadStatus(c.getInt(c.getColumnIndex(C_DOWNLOADSTATUS)));
 				content.setDownloadedSize(c.getInt(c.getColumnIndex(C_DOWNLOADEDSIZE)));
 				content.setContentSize(c.getInt(c.getColumnIndex(C_CONTENTSIZE)));
+				content.setPkId(c.getInt(c.getColumnIndex(KEY_ID)));
 				
 				contents.add(content);
 			} while (c.moveToNext());
@@ -445,6 +449,8 @@ public class Database extends SQLiteOpenHelper {
 		String selectQuery = "SELECT  * FROM " + TABLE_CONTENT + " WHERE "
 				+ "brand_id" + " = " + brandId+ " AND "+C_DOWNLOADSTATUS+" = 1";
 
+		System.out.println("Content Query :"+selectQuery);
+		
 		SQLiteDatabase db = this.getReadableDatabase();
 		Cursor c = db.rawQuery(selectQuery, null);
 
@@ -458,6 +464,7 @@ public class Database extends SQLiteOpenHelper {
 				content.setDownloadStatus(c.getInt(c.getColumnIndex(C_DOWNLOADSTATUS)));
 				content.setDownloadedSize(c.getInt(c.getColumnIndex(C_DOWNLOADEDSIZE)));
 				content.setContentSize(c.getInt(c.getColumnIndex(C_CONTENTSIZE)));
+				content.setPkId(c.getInt(c.getColumnIndex(KEY_ID)));
 				
 				contents.add(content);
 			} while (c.moveToNext());
@@ -535,24 +542,24 @@ public class Database extends SQLiteOpenHelper {
 		
 		if (c != null)
 		{	
-			c.moveToFirst();
+			//c.moveToFirst();
 
+			if(c.moveToFirst())
+			{
+				ch = new Child();
+				
+				ch.setmID((c.getInt(c.getColumnIndex(CH_ID))));
+				ch.setmName((c.getString(c.getColumnIndex(CH_NAME))));
+				ch.setmContentUrl((c.getString(c.getColumnIndex(CH_CONTENTURL))));
+				ch.setmChildViewTime(c.getString(c.getColumnIndex(CH_CHILDVIEWTIME)));
+				ch.setmFilePath(c.getString(c.getColumnIndex(CH_FILEPATH)));
+				//ch.setmIsAnimated(Boolean.parseBoolean(c.getString(c.getColumnIndex(CH_MISANIMATED))));
+				//ch.setmAnimPath(c.getInt(c.getColumnIndex(CH_MANIMPATH)));
+				ch.setmTimeInterval(c.getInt(c.getColumnIndex(CH_TIMEINTERVAL)));
+				ch.setmType(c.getInt(c.getColumnIndex(CH_TYPE)));
+			}
+		}
 		
-		}
-		if(c.getCount() != 0)
-		{
-			ch = new Child();
-			
-			ch.setmID((c.getInt(c.getColumnIndex(CH_ID))));
-			ch.setmName((c.getString(c.getColumnIndex(CH_NAME))));
-			ch.setmContentUrl((c.getString(c.getColumnIndex(CH_CONTENTURL))));
-			ch.setmChildViewTime(c.getString(c.getColumnIndex(CH_CHILDVIEWTIME)));
-			ch.setmFilePath(c.getString(c.getColumnIndex(CH_FILEPATH)));
-			//ch.setmIsAnimated(Boolean.parseBoolean(c.getString(c.getColumnIndex(CH_MISANIMATED))));
-			//ch.setmAnimPath(c.getInt(c.getColumnIndex(CH_MANIMPATH)));
-			ch.setmTimeInterval(c.getInt(c.getColumnIndex(CH_TIMEINTERVAL)));
-			ch.setmType(c.getInt(c.getColumnIndex(CH_TYPE)));
-		}
 		db.close();
 		return ch;
 	}
@@ -581,7 +588,7 @@ public class Database extends SQLiteOpenHelper {
 				//ch.setmAnimPath(c.getInt(c.getColumnIndex(CH_MANIMPATH)));
 				ch.setmTimeInterval(c.getInt(c.getColumnIndex(CH_TIMEINTERVAL)));
 				ch.setmType(c.getInt(c.getColumnIndex(CH_TYPE)));
-
+				ch.setPkID(c.getInt(c.getColumnIndex(KEY_ID)));
 				// adding to todo list
 				children.add(ch);
 			} while (c.moveToNext());
@@ -593,7 +600,7 @@ public class Database extends SQLiteOpenHelper {
 	/*
 	 * getting all Children
 	 */
-	public List<Child> getChilds(int parentId) {
+	public List<Child> getChilds(long parentId) {
 		List<Child> children = new ArrayList<Child>();
 		String selectQuery = "SELECT  * FROM " + TABLE_CHILD + " WHERE "
 				+ "parent_id" + " = " + parentId;
@@ -615,7 +622,7 @@ public class Database extends SQLiteOpenHelper {
 				//ch.setmAnimPath(c.getInt(c.getColumnIndex(CH_MANIMPATH)));
 				ch.setmTimeInterval(c.getInt(c.getColumnIndex(CH_TIMEINTERVAL)));
 				ch.setmType(c.getInt(c.getColumnIndex(CH_TYPE)));
-
+				ch.setPkID(c.getInt(c.getColumnIndex(KEY_ID)));
 				// adding to todo list
 				children.add(ch);
 			} while (c.moveToNext());
@@ -694,15 +701,15 @@ public class Database extends SQLiteOpenHelper {
 		Brand brand = null;
 		if (c != null)
 		{
-			c.moveToFirst();
-
+			if(c.moveToFirst())
+			{
+				brand = new Brand();
+				brand.setmName((c.getString(c.getColumnIndex(B_NAME))));
+				brand.setmId(c.getInt(c.getColumnIndex(B_ID)));
+				brand.setPkId(c.getInt(c.getColumnIndex(KEY_ID)));
+			}
 		}
-		if(c.getCount() != 0)
-		{
-			brand = new Brand();
-			brand.setmName((c.getString(c.getColumnIndex(B_NAME))));
-			brand.setmId(c.getInt(c.getColumnIndex(B_ID)));
-		}
+		
 		db.close();
 		return brand;
 	}
@@ -723,6 +730,7 @@ public class Database extends SQLiteOpenHelper {
 				Brand brand = new Brand();
 				brand.setmName((c.getString(c.getColumnIndex(B_NAME))));
 				brand.setmId(c.getInt(c.getColumnIndex(B_ID)));
+				brand.setPkId(c.getInt(c.getColumnIndex(KEY_ID)));
 
 				// adding to Brand list
 				brands.add(brand);

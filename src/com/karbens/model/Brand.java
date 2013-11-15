@@ -10,6 +10,7 @@ public class Brand implements Parcelable {
 
 	private String mName = "";
 	private int mId = 0;
+	private int pkId = 0; // Brand Primary Key
 	private ArrayList<Content> mContentArr= new ArrayList<Content>();
 	
 	
@@ -24,6 +25,14 @@ public class Brand implements Parcelable {
 		this.mId = mId;
 	}
 	
+	public int getPkId() {
+		return pkId;
+	}
+
+
+	public void setPkId(int pkId) {
+		this.pkId = pkId;
+	}
 	
 	public String getmName() {
 		
@@ -87,5 +96,8 @@ public class Brand implements Parcelable {
 			// TODO Auto-generated constructor stub
 			//mContentArr = new ArrayList<Content>();
 		}
+
+
+		
 
 }
